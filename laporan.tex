@@ -1,0 +1,649 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{verbatim}
+\usepackage{multirow}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+\title{Penerapan Eigenvalue Decomposition dan Power Iteration Method dalam Analisis Kerentanan Jaringan Drainase Perkotaan}
+
+\author{\IEEEauthorblockN{1\textsuperscript{st} Nashiruddin Akram}
+\IEEEauthorblockA{\textit{IF2123 Aljabar Linear dan Geometri} \\
+\textit{STEI - Institut Teknologi Bandung}\\
+Bandung, Indonesia \\
+\texttt{13524090@std.stei.itb.ac.id}}
+}
+
+\maketitle
+
+\begin{abstract}
+Jaringan drainase perkotaan memiliki peran vital dalam mitigasi banjir, namun analisis kerentanannya masih terbatas pada inspeksi lokal tanpa mempertimbangkan interkonektivitas sistemik. Makalah ini mengaplikasikan metode aljabar linear---eigenvalue decomposition dan power iteration method---untuk mengidentifikasi simpul kritis dalam jaringan drainase berbasis matriks Laplacian. Melalui integrasi spectral centrality dan parameter hidraulik (elevasi, kapasitas aliran, sedimentasi), penelitian ini menganalisis jaringan sintetis 200 simpul dengan 851 koneksi. Hasil menunjukkan algebraic connectivity $\lambda_2 = 0.075$ mengindikasikan jaringan rentan fragmentasi, dengan 30\% simpul teridentifikasi berkategori kerentanan tinggi. Korelasi eigenvalue centrality terhadap vulnerability mencapai $r = 0.715$, memvalidasi efektivitas metode dalam penilaian sistemik kerentanan jaringan untuk prioritas pemeliharaan preventif.
+\end{abstract}
+
+\begin{IEEEkeywords}
+matriks Laplacian, eigenvalue decomposition, power iteration method, spectral centrality, jaringan drainase, analisis kerentanan
+\end{IEEEkeywords}
+
+\section{PENDAHULUAN}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.38\textwidth]{Drainase.png}
+    \caption{Ilustrasi jaringan drainase perkotaan dengan struktur hierarkis}
+\end{figure}
+
+Infrastruktur drainase perkotaan merupakan elemen krusial dalam sistem pengendalian banjir dan pengelolaan air permukaan. Urbanisasi yang masif telah mengubah karakteristik hidrologi wilayah perkotaan melalui peningkatan area kedap air, reduksi zona resapan alami, dan modifikasi pola aliran permukaan. Konsekuensinya, volume limpasan meningkat signifikan tanpa diimbangi perluasan kapasitas jaringan drainase eksisting. Ditambah dengan intensifikasi curah hujan akibat perubahan iklim global, risiko banjir perkotaan meningkat drastis. Kondisi ini menuntut pendekatan evaluasi sistemik terhadap kerentanan jaringan drainase yang tidak hanya mempertimbangkan kapasitas lokal, namun juga interkonektivitas dan peran kritis setiap komponen dalam menjaga integritas sistem secara keseluruhan.
+
+Praktik konvensional dalam penilaian kerentanan drainase cenderung berorientasi pada parameter lokal seperti dimensi saluran, tingkat sedimentasi, atau kondisi struktural individual. Meskipun relevan untuk maintenance operasional, pendekatan tersebut gagal mengakomodasi dinamika propagasi gangguan dalam sistem jaringan yang kompleks dan saling terhubung. Kegagalan pada satu simpul strategis dapat memicu efek domino yang mempengaruhi stabilitas aliran di wilayah yang secara topologis bergantung padanya. Gap inilah yang memotivasi pengembangan metode analisis berbasis teori graf yang mampu menangkap karakteristik global jaringan---khususnya melalui analisis spektral matriks Laplacian---untuk mengidentifikasi simpul kritis secara kuantitatif dan sistemik.ktral matriks Laplacian---untuk mengidentifikasi simpul kritis secara kuantitatif dan sistemik.
+
+Matriks Laplacian, sebagai representasi aljabar dari struktur graf, menyediakan framework matematis untuk menganalisis properti konektivitas dan stabilitas jaringan melalui eigenvalue decomposition. Eigenvalue terkecil kedua ($\lambda_2$), yang dikenal sebagai algebraic connectivity, menjadi indikator robustness jaringan terhadap fragmentasi. Sementara itu, eigenvector dominan dari matriks adjacency---yang dapat dihitung efisien melalui power iteration method---memberikan ukuran sentralitas spektral yang mengidentifikasi simpul dengan pengaruh sistemik tertinggi. Penelitian ini mengimplementasikan kedua metode aljabar linear tersebut dalam konteks analisis kerentanan jaringan drainase, dengan mengintegrasikan faktor topologi (degree centrality, eigenvalue centrality) dan parameter hidraulik (elevasi, kapasitas aliran, sedimentasi, beban hidraulik) untuk menghasilkan ranking kuantitatif simpul kritis yang dapat menjadi basis pengambilan keputusan pemeliharaan preventif dan alokasi sumber daya infrastruktur.
+
+
+
+\section{Dasar Teori}
+
+\subsection{Graf Berarah dan Matriks Adjacency}
+Graf berarah $G = (V, E)$ terdiri dari himpunan simpul $V$ dan himpunan sisi berarah $E$. Dalam konteks jaringan drainase, simpul merepresentasikan titik pertemuan atau percabangan saluran, sedangkan sisi berarah merepresentasikan arah aliran air antar simpul.
+
+Representasi matriks yang digunakan adalah matriks adjacency $A$ berukuran $n \times n$, dengan elemen:
+\[
+A_{ij} =
+\begin{cases}
+1, & \text{jika terdapat aliran dari simpul } i \text{ menuju simpul } j, \\
+0, & \text{lainnya}.
+\end{cases}
+\]
+
+% Placeholder gambar (minimal)
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[width=0.42\textwidth]{graph_example.png}
+%     \caption{Representasi graf berarah dari jaringan drainase.}
+% \end{figure}
+
+\subsection{Nilai Eigen dan Vektor Eigen}
+Untuk suatu matriks persegi $A$, nilai eigen $\lambda$ dan vektor eigen $x$ didefinisikan melalui persamaan:
+\[
+A x = \lambda x.
+\]
+Nilai eigen dapat dicari melalui penyelesaian determinan:
+\[
+\det(A - \lambda I) = 0.
+\]
+Vektor eigen yang terkait dengan nilai eigen terbesar memiliki interpretasi penting dalam analisis jaringan, terutama dalam mengukur pengaruh dan prioritas suatu simpul.
+
+\subsection{Eigenvalue Centrality}
+Eigenvalue centrality mengukur tingkat kepentingan simpul berdasarkan konektivitasnya dengan simpul lain yang juga memiliki tingkat kepentingan tinggi.
+
+Jika $c_i$ adalah sentralitas simpul $i$, maka:
+\[
+c_i = \frac{1}{\lambda} \sum_{j=1}^{n} A_{ij} c_j.
+\]
+Secara matriks, sentralitas memenuhi persamaan:
+\[
+A c = \lambda c,
+\]
+dengan $c$ merupakan vektor eigen dari $A$ yang sesuai dengan nilai eigen dominan $\lambda$.
+
+\subsection{Power Iteration}
+Power iteration adalah metode numerik paling sederhana untuk menghitung nilai eigen terbesar dan vektor eigennya. Karena matriks adjacency pada jaringan drainase dapat berukuran besar, metode ini menjadi relevan.
+
+Algoritma dasarnya:
+\[
+x^{(k+1)} = \frac{A x^{(k)}}{\| A x^{(k)} \|}.
+\]
+
+Metode ini akan konvergen menuju vektor eigen dominan selama matriks memiliki nilai eigen terbesar yang unik.
+
+\subsection{Spectral Radius}
+Spectral radius $\rho(A)$ didefinisikan sebagai nilai absolut terbesar dari seluruh nilai eigen matriks adjacency:
+\[
+\rho(A) = \max_i |\lambda_i|.
+\]
+
+Dalam konteks jaringan drainase, spectral radius dapat memberikan informasi mengenai:
+\begin{itemize}
+    \item stabilitas aliran air dalam jaringan,
+    \item sensitivitas jaringan terhadap perubahan struktur,
+    \item potensi titik rawan saat terjadi peningkatan debit air.
+\end{itemize}
+
+\subsection{Keterhubungan Graf (Graph Connectivity)}
+Keterhubungan graf berperan penting dalam menilai apakah aliran air dapat diteruskan antar simpul tanpa hambatan. Untuk graf berarah, keterhubungan dapat diuji dengan:
+\[
+\text{Jika terdapat path dari } v_i \text{ ke } v_j, \text{ maka } i \rightarrow j.
+\]
+
+Keterhubungan menentukan apakah suatu simpul benar-benar berkontribusi terhadap jaringan. Dalam analisis drainase, simpul yang memiliki konektivitas terbatas atau hanya berperan sebagai terminal dapat memiliki nilai eigen yang rendah.
+
+% Placeholder gambar (minimal)
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[width=0.42\textwidth]{connectivity_placeholder.png}
+%     \caption{Contoh struktur konektivitas dalam jaringan drainase.}
+% \end{figure}
+
+\subsection{Faktor Hidraulik dalam Analisis Kerentanan}
+Selain analisis struktural berbasis graf, karakteristik hidraulik fisik dari jaringan drainase turut memengaruhi kerentanan sistemik. Faktor-faktor ini meliputi:
+
+\subsubsection{Topografi dan Elevasi}
+Elevasi simpul $h_i$ menentukan tingkat risiko genangan. Simpul dengan elevasi rendah memiliki risiko banjir lebih tinggi karena cenderung menjadi titik akumulasi air:
+\[
+r_{\text{elev}}(i) = 1 - \frac{h_i - h_{\min}}{h_{\max} - h_{\min}}.
+\]
+
+\subsubsection{Kapasitas Aliran (Flow Capacity)}
+Kapasitas saluran $Q_i$ (m$^3$/s) menunjukkan kemampuan maksimum saluran menampung debit air. Ketidakseimbangan antara kapasitas dan intensitas hujan menyebabkan overload:
+\[
+r_{\text{cap}}(i) = \frac{R_i}{Q_i \cdot k},
+\]
+dengan $R_i$ intensitas hujan (mm/jam) dan $k$ faktor konversi.
+
+\subsubsection{Risiko Sedimentasi}
+Sedimentasi mengurangi kapasitas efektif saluran dan meningkatkan probabilitas penyumbatan. Risiko sedimentasi $r_{\text{sed}}(i) \in [0,1]$ bergantung pada frekuensi pemeliharaan dan kondisi lingkungan sekitar.
+
+\subsubsection{Beban Hidraulik (Hydraulic Load)}
+Beban hidraulik menggambarkan tingkat utilisasi kapasitas:
+\[
+r_{\text{load}}(i) = \min\left(1, \frac{R_i}{Q_i \cdot 10}\right).
+\]
+
+Integrasi keempat faktor tersebut membentuk skor kerentanan hidraulik:
+\[
+H_{\text{vul}}(i) = 0.25 \cdot r_{\text{elev}}(i) + 0.30 \cdot r_{\text{cap}}(i) + 0.25 \cdot r_{\text{sed}}(i) + 0.20 \cdot r_{\text{load}}(i).
+\]
+
+\subsection{Kerentanan Jaringan Drainase}
+Kerentanan sistemik jaringan drainase dirumuskan sebagai kombinasi linear dari eigenvalue centrality, degree centrality, dan kerentanan hidraulik:
+\[
+\text{Vul}(i) = w_1 \cdot c_i + w_2 \cdot \frac{\deg(i)}{n-1} + w_3 \cdot H_{\text{vul}}(i),
+\]
+dengan bobot $w_1 = 0.30$, $w_2 = 0.30$, dan $w_3 = 0.40$. 
+
+Simpul dengan nilai $\text{Vul}(i)$ tinggi merupakan titik kritis yang kegagalannya dapat memengaruhi stabilitas jaringan secara keseluruhan.
+
+
+
+
+
+\section{METODOLOGI PENELITIAN}
+
+Metodologi penelitian ini dirancang untuk melakukan analisis spektral pada jaringan hidraulik kota dengan jumlah simpul mencapai 200 titik drainase sebagai prototype implementasi. Pendekatan berbasis matriks Laplacian digunakan untuk mengidentifikasi simpul dengan tingkat kerentanan struktural tertinggi sehingga dapat digunakan dalam perencanaan mitigasi banjir. Seluruh tahapan menggabungkan teori graf, aljabar linear, dan prinsip hidrologi perkotaan untuk menghasilkan analisis yang komprehensif.
+
+\subsection{Tahap I: Pemodelan Graf Jaringan Drainase}
+
+Tahap ini berfokus pada konstruksi model matematis jaringan drainase dalam bentuk graf berarah $G = (V, E)$, di mana setiap simpul mewakili titik saluran, dan setiap sisi mewakili arah aliran.
+
+\bigskip
+\subsubsection{Representasi Graf Berarah}
+Dataset berupa peta jaringan drainase direkonstruksi menjadi himpunan simpul $V$ dan sisi berarah $E$. Dataset yang digunakan terdiri dari 200 simpul yang dikelompokkan secara hierarkis: 20 simpul backbone (saluran utama), 150 simpul secondary (saluran sekunder), dan 30 simpul peripheral (saluran tersier/dead-end).
+
+\bigskip
+\subsubsection{Pembentukan Matriks Adjacency $A$}
+Struktur konektivitas direpresentasikan melalui matriks adjacency berukuran $N \times N$:
+\[
+    A_{ij} =
+    \begin{cases}
+        1, & \text{jika terdapat aliran dari simpul } i \to j, \\
+        0, & \text{lainnya}.
+    \end{cases}
+\]
+Untuk meningkatkan stabilitas numerik, matriks adjacency diperlakukan secara simetris ($A_{ij} = A_{ji}$) sehingga graf dapat dianalisis sebagai undirected graph.
+
+\bigskip
+\subsubsection{Pembentukan Matriks Derajat $D$}
+Derajat setiap simpul dihitung dengan:
+\[
+    D_{ii} = \sum_j A_{ij}.
+\]
+Matriks derajat menangkap intensitas keterhubungan simpul dan menjadi komponen penting bagi Laplacian.
+
+\bigskip
+\subsubsection{Pembentukan Matriks Laplacian $L$}
+Laplacian graf dihitung sebagai:
+\[
+    L = D - A.
+\]
+Matriks Laplacian mengandung informasi struktural yang lebih kaya dibanding adjacency sehingga menjadi basis analisis spektral.
+
+\bigskip
+\subsubsection{Normalized Laplacian (Opsional)}
+Untuk meningkatkan stabilitas numerik pada dataset besar, dapat digunakan bentuk terstandardisasi:
+\[
+    \mathcal{L} = D^{-1/2} L D^{-1/2}.
+\]
+Normalized Laplacian membantu mencegah bias akibat simpul berderajat ekstrem.
+
+% --------------------------------------------------------------------
+\bigskip
+\subsection{Tahap II: Analisis Spektral dengan Eigenvalue dan Eigenvector}
+
+Tahap ini bertujuan mengevaluasi sifat struktural jaringan melalui spektrum eigen dari matriks Laplacian, khususnya untuk mengidentifikasi simpul yang berkontribusi besar terhadap kerentanan sistemik.
+
+\bigskip
+\subsubsection{Perhitungan Nilai Eigen}
+Nilai eigen diperoleh dengan menyelesaikan persamaan karakteristik:
+\[
+    \det(L - \lambda I) = 0.
+\]
+Spektrum eigen memberikan gambaran kondisi global jaringan. Dalam implementasi numerik, digunakan metode \texttt{np.linalg.eigh()} untuk matriks simetris.
+
+\bigskip
+\subsubsection{Analisis Algebraic Connectivity ($\lambda_2$)}
+Nilai eigen kedua terkecil memiliki urutan:
+\[
+    \lambda_1 = 0 < \lambda_2 \leq \lambda_3 \leq \cdots.
+\]
+Nilai $\lambda_2$ menunjukkan tingkat keterhubungan jaringan; semakin kecil nilainya, semakin rentan jaringan terhadap pemisahan. Untuk jaringan drainase yang robust, diharapkan $\lambda_2 \geq 0.1$.
+
+\bigskip
+\subsubsection{Ekstraksi Fiedler Vector ($v_2$)}
+Vektor eigen yang berada pada nilai $\lambda_2$ dikenal sebagai \textit{Fiedler Vector}:
+\[
+    L v_2 = \lambda_2 v_2.
+\]
+Fiedler Vector menjadi indikator utama sensitivitas setiap simpul terhadap kegagalan sistemik.
+
+\bigskip
+\subsubsection{Eigenvalue Centrality via Power Iteration}
+Untuk menghitung eigenvalue centrality, digunakan metode power iteration pada matriks adjacency:
+\[
+x^{(k+1)} = \frac{A x^{(k)}}{\| A x^{(k)} \|}.
+\]
+Iterasi dilakukan hingga konvergensi dengan toleransi $\epsilon = 10^{-6}$ atau maksimum 100 iterasi. Vektor hasil konvergensi merepresentasikan eigenvalue centrality setiap simpul.
+
+\bigskip
+\subsubsection{Perhitungan Spectral Radius}
+Spectral radius dihitung sebagai:
+\[
+\rho(A) = \max_i |\lambda_i(A)|,
+\]
+yang memberikan informasi mengenai dominasi hub nodes dalam jaringan. Rasio $\rho(A)/\text{deg}_{\text{avg}}$ menunjukkan tingkat sentralisasi jaringan.
+
+\bigskip
+\subsubsection{Transformasi Ruang Eigen (Eigenbasis)}
+Dengan memanfaatkan basis eigen Laplacian, simpul-simpul dapat direpresentasikan dalam ruang berdimensi rendah yang menggambarkan pola struktur dan kerentanan jaringan.
+
+% --------------------------------------------------------------------
+\bigskip
+\subsection{Tahap III: Analisis Hidraulik dan Integrasi Multi-Faktor}
+
+Tahap ini mengintegrasikan parameter hidraulik fisik dengan hasil analisis spektral untuk membentuk skor kerentanan komprehensif.
+
+\bigskip
+\subsubsection{Ekstraksi Parameter Hidraulik}
+Setiap simpul dilengkapi dengan parameter hidraulik:
+\begin{itemize}
+    \item Elevasi $h_i$ (meter di atas permukaan laut)
+    \item Kapasitas aliran $Q_i$ (m$^3$/s)
+    \item Intensitas hujan desain $R_i$ (mm/jam)
+    \item Risiko sedimentasi $r_{\text{sed}}(i) \in [0,1]$
+    \item Lebar saluran dan diameter pipa
+\end{itemize}
+
+\bigskip
+\subsubsection{Perhitungan Risiko Elevasi}
+Risiko elevasi dihitung dengan normalisasi terbalik:
+\[
+r_{\text{elev}}(i) = 1 - \frac{h_i - h_{\min}}{h_{\max} - h_{\min}}.
+\]
+Simpul dengan elevasi rendah memiliki $r_{\text{elev}}$ tinggi.
+
+\bigskip
+\subsubsection{Perhitungan Risiko Kapasitas}
+Risiko kapasitas didasarkan pada rasio hujan terhadap kapasitas:
+\[
+r_{\text{cap}}(i) = \min\left(1, \frac{R_i}{Q_i \cdot 10}\right).
+\]
+
+\bigskip
+\subsubsection{Perhitungan Beban Hidraulik}
+Beban hidraulik menunjukkan tingkat utilisasi kapasitas:
+\[
+r_{\text{load}}(i) = \min\left(1, \frac{R_i}{Q_i \cdot 10}\right).
+\]
+
+\bigskip
+\subsubsection{Integrasi Skor Kerentanan Hidraulik}
+Kerentanan hidraulik dihitung sebagai kombinasi weighted:
+\[
+H_{\text{vul}}(i) = 0.25 \cdot r_{\text{elev}}(i) + 0.30 \cdot r_{\text{cap}}(i) + 0.25 \cdot r_{\text{sed}}(i) + 0.20 \cdot r_{\text{load}}(i).
+\]
+
+\bigskip
+\subsubsection{Perhitungan Skor Kerentanan Terintegrasi}
+Skor kerentanan final mengintegrasikan faktor spektral dan hidraulik:
+\[
+\text{Vul}(i) = 0.30 \cdot c_i + 0.30 \cdot \frac{\deg(i)}{n-1} + 0.40 \cdot H_{\text{vul}}(i),
+\]
+dengan:
+\begin{itemize}
+    \item $c_i$: Eigenvalue centrality (dari power iteration)
+    \item $\deg(i)/(n-1)$: Normalized degree centrality
+    \item $H_{\text{vul}}(i)$: Hydraulic vulnerability
+\end{itemize}
+
+Bobot dipilih untuk memberikan penekanan lebih pada faktor hidraulik (40\%) sebagai faktor fisik dominan, diimbangi oleh faktor struktural spektral (30\%) dan topologis (30\%).
+
+\bigskip
+\subsubsection{Transformasi dan Normalisasi Skor}
+Untuk menghasilkan distribusi skor yang lebih realistis, dilakukan power transformation:
+\[
+\text{Vul}'(i) = [\text{Vul}(i)]^{0.7}.
+\]
+Kemudian skor dinormalisasi ke rentang $[0, 0.95]$ untuk menghindari artificial ceiling:
+\[
+\text{Vul}''(i) = \text{Vul}'(i) \cdot \frac{0.95}{\max_j \text{Vul}'(j)}.
+\]
+
+% --------------------------------------------------------------------
+\bigskip
+\subsection{Tahap IV: Evaluasi Kerentanan dan Identifikasi Simpul Kritis}
+
+Tahap ini menerjemahkan hasil spektral dan hidraulik menjadi metrik kerentanan yang dapat diinterpretasikan secara operasional.
+
+\bigskip
+\subsubsection{Klasifikasi Kategori Kerentanan}
+Simpul diklasifikasikan berdasarkan persentil skor:
+\[
+\text{Kategori}(i) =
+\begin{cases}
+\text{High}, & \text{jika } \text{Vul}(i) \geq P_{70}, \\
+\text{Medium}, & \text{jika } P_{30} < \text{Vul}(i) < P_{70}, \\
+\text{Low}, & \text{jika } \text{Vul}(i) \leq P_{30}.
+\end{cases}
+\]
+
+\bigskip
+\subsubsection{Ranking Simpul Kritis}
+Simpul-simpul dengan skor $\text{Vul}(i)$ tertinggi diidentifikasi sebagai simpul kritis. Dalam implementasi, fokus diberikan pada top 15 simpul dengan kerentanan tertinggi untuk prioritas penanganan.
+
+\bigskip
+\subsubsection{Partisi Graf Spektral (Opsional)}
+Pembagian zona kerentanan dapat dilakukan dengan Fiedler Vector:
+\[
+    \text{Cluster 1} = \{i \mid v_{2,i} < 0\}, \quad
+    \text{Cluster 2} = \{i \mid v_{2,i} > 0\}.
+\]
+Teknik ini membantu mengidentifikasi wilayah yang paling rentan secara struktural.
+
+\bigskip
+\subsubsection{Validasi Multi-Kriteria}
+Hasil analisis divalidasi terhadap 7 kriteria teoritis:
+\begin{enumerate}
+    \item Korelasi degree-vulnerability (expected: positive)
+    \item Korelasi elevation-vulnerability (expected: negative)
+    \item Korelasi sediment-vulnerability (expected: positive)
+    \item Korelasi hydraulic load-vulnerability (expected: positive)
+    \item Korelasi eigenvalue centrality-vulnerability (expected: positive)
+    \item Keseimbangan multi-faktor (high degree + high hydraulic)
+    \item Distribusi realistis (variance, IQR)
+\end{enumerate}
+
+\bigskip
+\subsubsection{Visualisasi Jaringan}
+Hasil analisis divisualisasikan dalam graf jaringan, di mana warna dan ukuran simpul mewakili nilai kerentanan, serta dilengkapi dengan tabel ranking simpul kritis beserta parameter hidrauliknya.
+
+
+
+
+
+\section{HASIL DAN PEMBAHASAN}
+
+\subsection{Dataset dan Akses Data}
+Dataset penelitian terdiri dari 200 simpul jaringan drainase dengan struktur hierarkis (20 backbone, 150 secondary, 30 peripheral) dan 851 koneksi berarah. Data mencakup koordinat geografis dan 6 parameter hidraulik: elevasi (5.0--23.6 m), kapasitas aliran (0.5--9.7 m³/s), intensitas hujan (30.8--109.0 mm/h), risiko sedimentasi (0.223--0.894), lebar saluran, dan beban hidraulik.
+
+Dataset lengkap tersedia di:
+\begin{verbatim}
+https://drive.google.com/your-link-here
+\end{verbatim}
+
+File yang disertakan:
+\begin{itemize}
+    \item \texttt{nodes.csv} -- Data simpul dengan parameter hidraulik
+    \item \texttt{edges.csv} -- Data koneksi dengan flow rate dan diameter pipa
+\end{itemize}
+
+\subsection{Implementasi Algoritma}
+
+Implementasi dilakukan dalam Python 3.12 menggunakan NumPy untuk komputasi matriks dan Pandas untuk manipulasi data. Berikut snippet kode utama untuk analisis spektral dan integrasi hidraulik:
+
+\begin{verbatim}
+import numpy as np
+import pandas as pd
+
+class HydraulicDrainageAnalyzer:
+    def construct_matrices(self):
+        # Symmetric adjacency matrix
+        A = np.zeros((n, n))
+        for edge in edges:
+            A[edge.src, edge.tgt] = 1
+            A[edge.tgt, edge.src] = 1
+        
+        # Laplacian: L = D - A
+        D = np.diag(A.sum(axis=1))
+        L = D - A
+        return L
+    
+    def spectral_analysis(self):
+        # Eigenvalue decomposition
+        vals, vecs = np.linalg.eigh(L)
+        lambda2 = vals[1]  # Algebraic connectivity
+        rho_A = np.max(np.abs(np.linalg.eigvalsh(A)))
+        return lambda2, rho_A
+    
+    def power_iteration(self, max_iter=100, tol=1e-6):
+        x = np.random.rand(n)
+        for k in range(max_iter):
+            x_new = A @ x / np.linalg.norm(A @ x)
+            if np.linalg.norm(x_new - x) < tol:
+                break
+            x = x_new
+        return x  # Eigenvalue centrality
+    
+    def hydraulic_vulnerability(self):
+        r_elev = 1 - (h - h.min())/(h.max() - h.min())
+        r_cap = np.clip(R / (Q * 10), 0, 1)
+        H_vul = 0.25*r_elev + 0.30*r_cap + 
+                0.25*r_sed + 0.20*r_load
+        return H_vul
+    
+    def integrated_vulnerability(self):
+        Vul = 0.30*c + 0.30*deg/(n-1) + 0.40*H_vul
+        Vul = np.power(Vul, 0.7) * (0.95/Vul.max())
+        return Vul
+\end{verbatim}
+
+Kode lengkap tersedia di repository bersama dataset.
+
+\subsection{Hasil Analisis Spektral}
+
+Hasil dekomposisi eigen pada matriks Laplacian $L$ menghasilkan spektrum eigenvalue dengan properti sebagaimana ditunjukkan pada Tabel~\ref{tab:spektral}.
+
+\begin{table}[!htbp]
+\centering
+\caption{Properti Spektral Jaringan}
+\label{tab:spektral}
+\begin{tabular}{lc}
+\toprule
+\textbf{Metrik} & \textbf{Nilai} \\
+\midrule
+Algebraic connectivity ($\lambda_2$) & 0.0749 \\
+Spectral radius ($\rho(A)$) & 10.23 \\
+Average degree & 7.89 \\
+Degree range & 1--16 \\
+$\rho(A)/\text{deg}_{\text{avg}}$ & 1.30 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Nilai $\lambda_2 = 0.0749 < 0.1$ mengindikasikan jaringan sangat rentan terhadap fragmentasi, sesuai dengan literatur bahwa $\lambda_2$ kecil menunjukkan konektivitas lemah. Spectral radius $\rho(A) = 10.23$ dengan rasio 1.30 terhadap average degree menunjukkan moderate hub dominance, tidak ekstrem seperti star topology.
+
+\subsection{Distribusi Kerentanan}
+
+Klasifikasi kerentanan berdasarkan persentil $P_{70}$ dan $P_{30}$ menghasilkan distribusi sebagaimana ditunjukkan pada Tabel~\ref{tab:distribusi}.
+
+\begin{table}[!htbp]
+\centering
+\caption{Distribusi Kategori Kerentanan}
+\label{tab:distribusi}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Kategori} & \textbf{Jumlah} & \textbf{Persentase} \\
+\midrule
+High (Vul $\geq$ 0.739) & 60 & 30.0\% \\
+Medium (0.615--0.739) & 80 & 40.0\% \\
+Low (Vul $\leq$ 0.615) & 60 & 30.0\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Distribusi 30-40-30 menunjukkan hasil yang realistis tanpa bias ekstrem, dengan standar deviasi 0.143 dan IQR 0.160 yang mengindikasikan variance memadai.
+
+\subsection{Identifikasi Simpul Kritis}
+
+Tabel~\ref{tab:top10} menampilkan 10 simpul dengan kerentanan tertinggi. Node 94 dengan degree 16 (tertinggi) dan eigenvalue centrality 1.0 merupakan critical bottleneck utama. Seluruh top 10 nodes adalah secondary channels dengan kombinasi high degree (rata-rata 13.1 berbanding 7.89) dan elevated hydraulic risk.
+
+\begin{table}[!htbp]
+\centering
+\caption{Top 10 Simpul Kritis dengan Parameter Lengkap}
+\label{tab:top10}
+\scriptsize
+\begin{tabular}{@{}ccccccccc@{}}
+\toprule
+\textbf{Node} & \textbf{Deg} & \textbf{Vul} & \textbf{E-C} & \textbf{D-C} & \textbf{H-V} & \textbf{Elev} & \textbf{Cap} & \textbf{Rain} \\
+\midrule
+94 & 16 & 0.950 & 1.000 & 0.080 & 0.592 & 13.5 & 3.5 & 52.2 \\
+105 & 12 & 0.945 & 0.833 & 0.060 & 0.721 & 12.9 & 2.8 & 66.2 \\
+85 & 14 & 0.935 & 0.883 & 0.070 & 0.656 & 12.2 & 3.1 & 55.0 \\
+109 & 14 & 0.924 & 0.933 & 0.070 & 0.595 & 13.2 & 3.9 & 51.9 \\
+115 & 11 & 0.903 & 0.559 & 0.055 & 0.843 & 9.2 & 3.0 & 44.3 \\
+122 & 14 & 0.897 & 0.746 & 0.070 & 0.678 & 15.0 & 4.6 & 77.4 \\
+114 & 11 & 0.885 & 0.600 & 0.055 & 0.776 & 10.5 & 3.1 & 67.5 \\
+108 & 12 & 0.874 & 0.699 & 0.060 & 0.675 & 15.2 & 4.3 & 86.9 \\
+111 & 15 & 0.865 & 0.712 & 0.075 & 0.636 & 14.2 & 4.2 & 57.2 \\
+140 & 12 & 0.865 & 0.687 & 0.060 & 0.665 & 13.2 & 4.6 & 62.4 \\
+\bottomrule
+\end{tabular}
+\vspace{2pt}
+\scriptsize
+\textit{E-C=Eigen-C, D-C=Deg-C, H-V=H-Vul, Elev=Elev(m), Cap=Cap(m³/s), Rain=Rain(mm/h)}
+\end{table}
+
+\subsection{Validasi Teoritis}
+
+Tabel~\ref{tab:validation} menunjukkan hasil validasi terhadap 7 kriteria teoritis. Semua korelasi sesuai ekspektasi dengan signifikansi statistik ($p < 0.001$).
+
+\begin{table}[!htbp]
+\centering
+\caption{Hasil Validasi Multi-Kriteria}
+\label{tab:validation}
+\small
+\begin{tabular}{lcc}
+\toprule
+\textbf{Test} & \textbf{Hasil} & \textbf{Status} \\
+\midrule
+Degree $\to$ Vul (positive) & $r=0.400$ & \checkmark \\
+Elevation $\to$ Vul (negative) & $r=-0.316$ & \checkmark \\
+Sediment $\to$ Vul (positive) & $r=0.509$ & \checkmark \\
+Hydraulic Load $\to$ Vul (positive) & $r=0.562$ & \checkmark \\
+Eigen-C $\to$ Vul (positive) & $r=0.715$ & \checkmark \\
+Multi-factor balance & 5/10 deg, 8/10 hyd & \checkmark \\
+Distribution ($\sigma$, IQR) & 0.143, 0.160 & \checkmark \\
+\midrule
+\textbf{Overall Score} & \textbf{7/7 (100\%)} & \checkmark \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Korelasi eigenvalue centrality-vulnerability ($r=0.715$) adalah yang terkuat, mengonfirmasi bahwa power iteration berhasil mengidentifikasi simpul penting secara spektral. Korelasi hydraulic load ($r=0.562$) dan sediment risk ($r=0.509$) menunjukkan integrasi faktor hidraulik efektif.
+
+\subsection{Interpretasi Hasil}
+
+\subsubsection{Network Fragility}
+Nilai $\lambda_2 = 0.075$ jauh di bawah threshold 0.1 mengindikasikan jaringan sangat rentan terhadap disconnection. Removal satu simpul kritis dapat menyebabkan partisi jaringan menjadi komponen terpisah.
+
+\subsubsection{Hub Dominance}
+Moderate spectral radius ($\rho(A)/\text{deg}_{\text{avg}} = 1.30$) menunjukkan load distribution relatif merata dengan beberapa hub strategis. Tidak terjadi extreme centralization seperti pada star network.
+
+\subsubsection{Hydraulic Integration}
+Top 10 nodes menunjukkan kombinasi high degree (topological importance) dan elevated hydraulic risk. Node 115 dengan degree 11 (moderate) namun H-vul 0.843 (highest) membuktikan faktor hidraulik memberikan kontribusi signifikan, tidak hanya topologi.
+
+\subsubsection{Actionable Insights}
+Prioritas penanganan:
+\begin{enumerate}
+    \item Node 94, 105, 85: Critical hubs dengan high degree
+    \item Node 115, 114: High hydraulic risk (sediment, low elevation)
+    \item 60 nodes (30\%) kategori high: Focus maintenance
+\end{enumerate}
+
+\clearpage
+
+\section{KESIMPULAN}
+Penelitian ini berhasil mengimplementasikan analisis spektral terintegrasi untuk evaluasi kerentanan jaringan drainase dengan hasil sebagai berikut:
+
+\begin{enumerate}
+    \item \textbf{Network Fragility:} Algebraic connectivity λ₂ = 0.075 mengindikasikan jaringan sangat rentan dengan risiko fragmentasi tinggi jika simpul kritis mengalami kegagalan.
+    
+    \item \textbf{Spectral-Hydraulic Integration:} Korelasi eigenvalue centrality terhadap vulnerability (r=0.715) membuktikan power iteration method efektif mengidentifikasi simpul penting secara spektral. Integrasi faktor hidraulik (sediment r=0.509, hydraulic load r=0.562) memberikan penilaian komprehensif.
+    
+    \item \textbf{Vulnerability Distribution:} Distribusi 30-40-30 (high-medium-low) realistis dengan 60 simpul (30\%) kategori high vulnerability memerlukan prioritas pemeliharaan tertinggi.
+    
+    \item \textbf{Actionable Insights:} Metode ini menghasilkan ranking kuantitatif simpul kritis dengan multi-factor assessment yang dapat langsung digunakan untuk perencanaan pemeliharaan preventif dan alokasi sumber daya.
+\end{enumerate}
+
+Pendekatan ini mengatasi keterbatasan analisis konvensional yang hanya menilai aspek lokal, dengan memberikan perspektif sistemik terhadap integritas jaringan secara keseluruhan.
+
+\section{SARAN}
+Penelitian selanjutnya dapat dikembangkan dengan:
+\begin{enumerate}
+    \item \textbf{Validasi Empiris:} Aplikasi metode pada data kejadian banjir nyata untuk verifikasi akurasi prediksi simpul kritis.
+    
+    \item \textbf{Dynamic Analysis:} Implementasi time-series analysis untuk memodelkan perubahan vulnerability akibat variasi curah hujan musiman dan degradasi infrastruktur.
+    
+    \item \textbf{Optimization Framework:} Pengembangan model optimasi alokasi anggaran pemeliharaan berbasis vulnerability ranking untuk memaksimalkan peningkatan network robustness.
+    
+    \item \textbf{Machine Learning Integration:} Kombinasi spectral features dengan supervised learning untuk prediksi vulnerability pada jaringan baru atau expansion scenarios.
+    
+    \item \textbf{Multi-Objective Analysis:} Perluasan framework untuk mengakomodasi trade-off antara biaya maintenance, risiko banjir, dan service level agreements.
+\end{enumerate}
+
+\section{UCAPAN TERIMA KASIH}
+Penulis mengucapkan terima kasih kepada Tuhan Yang Maha Esa atas rahmat dan karunia-Nya. Terima kasih kepada Dr. Rinaldi Munir dan tim pengajar IF2123 Aljabar Linear dan Geometri yang telah memberikan fondasi teoritis yang kuat. Apresiasi juga disampaikan kepada rekan-rekan mahasiswa STEI ITB atas diskusi konstruktif selama pengembangan penelitian ini.
+
+\begin{thebibliography}{00}
+\bibitem{b1} F.R.K. Chung, ``Spectral Graph Theory,'' American Mathematical Society, Providence, RI, 1997.
+
+\bibitem{b2} M. Fiedler, ``Algebraic connectivity of graphs,'' Czechoslovak Mathematical Journal, vol. 23, no. 2, pp. 298-305, 1973.
+
+\bibitem{b3} U. Von Luxburg, ``A tutorial on spectral clustering,'' Statistics and Computing, vol. 17, no. 4, pp. 395-416, 2007.
+
+\bibitem{b4} P. Bonacich, ``Power and centrality: A family of measures,'' American Journal of Sociology, vol. 92, no. 5, pp. 1170-1182, 1987.
+
+\bibitem{b5} G. H. Golub and C. F. Van Loan, ``Matrix Computations,'' 3rd ed., Johns Hopkins University Press, Baltimore, 1996.
+
+\bibitem{b6} M.E.J. Newman, ``Networks: An Introduction,'' Oxford University Press, Oxford, 2010.
+
+\bibitem{b7} A.-L. Barabási, ``Network Science,'' Cambridge University Press, Cambridge, 2016.
+
+\bibitem{b8} L. W. Mays, ``Urban Water Supply Management Tools,'' McGraw-Hill, New York, 2000.
+
+\bibitem{b9} R. Munir, ``Aljabar Linear dan Geometri,'' Informatika, Bandung, 2024.
+
+\bibitem{b10} L. D. F. Costa et al., ``Characterization of complex networks: A survey of measurements,'' Advances in Physics, vol. 56, no. 1, pp. 167-242, 2007.
+\end{thebibliography}
+
+\end{document}
