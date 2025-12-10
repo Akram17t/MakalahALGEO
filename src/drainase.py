@@ -352,9 +352,10 @@ class HydraulicDrainageAnalyzer:
         
         return categories
     
-    def generate_report(self, output_file: str = 'vulnerability_analysis_results.csv'):
+    def generate_report(self):
         """
         Generate comprehensive report with all analysis results
+        Returns dataframe to be saved by caller
         """
         print(f"\n[10] Generating Report...")
         
@@ -386,10 +387,7 @@ class HydraulicDrainageAnalyzer:
         # Sort by vulnerability (descending)
         results = results.sort_values('vulnerability_score', ascending=False)
         
-        # Save to CSV
-        results.to_csv(output_file, index=False)
-        
-        print(f"  ✓ Report saved to: {output_file}")
+        print(f"  ✓ Report data generated")
         
         return results
     
@@ -472,14 +470,27 @@ class HydraulicDrainageAnalyzer:
 
 
 if __name__ == "__main__":
+    import os
+    
+    # Get absolute paths relative to script location
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(script_dir)
+    
+    nodes_file = os.path.join(project_root, 'data', 'nodes.csv')
+    edges_file = os.path.join(project_root, 'data', 'edges.csv')
+    output_file = os.path.join(project_root, 'hasil', 'results.csv')
+    
     # Initialize analyzer
     analyzer = HydraulicDrainageAnalyzer(
-        nodes_file='drainase_nodes_200.csv',
-        edges_file='drainase_edges_dense.csv'
+        nodes_file=nodes_file,
+        edges_file=edges_file
     )
     
     # Run complete analysis
     results = analyzer.run_complete_analysis()
     
+    # Save with proper path
+    results.to_csv(output_file, index=False)
+    
     print(f"\n📁 Output files:")
-    print(f"  • vulnerability_analysis_results.csv - Complete analysis results")
+    print(f"  • {output_file} - Complete analysis results")

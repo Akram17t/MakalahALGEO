@@ -2,11 +2,29 @@
 ## Spectral Analysis + Hydraulic Integration 💧
 
 Analisis jaringan drainase komprehensif yang mengintegrasikan:
-- **Spectral Analysis**: Eigenvalue/eigenvector decomposition (BAB 2)
-- **Power Iteration**: Eigenvalue centrality computation (BAB 2)
-- **Spectral Radius**: Network stability analysis (BAB 2)
-- **Hydraulic Modeling**: Elevation, flow capacity, rainfall, sediment (BAB 1)
-- **Multi-Factor Vulnerability**: Vul(i) = f(c_i, deg(i), flow(i)) (BAB 2)
+- **Spectral Analysis**: Eigenvalue/eigenvector decomposition
+- **Power Iteration**: Eigenvalue centrality computation
+- **Spectral Radius**: Network stability analysis
+- **Hydraulic Modeling**: Elevation, flow capacity, rainfall, sediment
+- **Multi-Factor Vulnerability**: Vul(i) = f(c_i, deg(i), H_vul(i))
+
+---
+
+## 📁 Struktur Repositori
+
+```
+MakalahALGEO/
+├── data/                 # Dataset input
+│   ├── nodes.csv        # 200 nodes dengan parameter hidraulik
+│   └── edges.csv        # 851 koneksi jaringan
+├── src/                  # Source code
+│   └── drainase.py      # Main analysis script
+├── doc/                  # Dokumentasi
+│   └── laporan.tex      # Laporan penelitian (LaTeX)
+├── hasil/                # Output hasil analisis
+│   └── vulnerability_analysis_results.csv
+└── README.md            # Dokumentasi ini
+```
 
 ---
 
@@ -35,60 +53,45 @@ Analisis jaringan drainase komprehensif yang mengintegrasikan:
 
 ## 🚀 Quick Start
 
-### 1. Generate Hydraulic Data
+### 1. Run Complete Analysis
 ```bash
-python generate_hydraulic_data.py
+cd src
+python drainase.py
 ```
-**Output:**
-- `nodes.csv` (with elevation, capacity, rainfall, sediment)
-- `edges.csv` (with flow rates, pipe diameter)
 
-### 2. Run Complete Analysis
-```bash
-python drainage_spectral_hydraulic.py
-```
-**Output:**
-- `vulnerability_analysis_results.csv` (all node details + scores)
-- Console output: Top 15 vulnerable nodes, network statistics
+**Input:**
+- `data/nodes.csv` - Node data dengan parameter hidraulik
+- `data/edges.csv` - Edge data dengan flow rates
 
-### 3. Validate Results
-```bash
-python validate_hydraulic_integration.py
-```
 **Output:**
-- 7 validation tests (degree, elevation, sediment, load, eigenvalue, integration, distribution)
-- Correlation analysis
-- **Result: 7/7 (100%) tests passed** ✅
+- `hasil/results.csv` - Complete analysis results dengan semua metrics
+- Console: Network statistics, top 15 vulnerable nodes
+
+### 2. Compile Dokumentasi LaTeX
+```bash
+cd doc
+pdflatex laporan.tex
+```
 
 ---
 
-## 📁 Files Structure
-
-```
-makalah/
-├── drainage_spectral_hydraulic.py      # ⭐ Main algorithm (spectral + hydraulic)
-├── drainage_spectral_analysis.py       # 📊 Spectral analysis module
-├── generate_hydraulic_data.py          # 🔧 Data generator with hydraulic params
-├── validate_hydraulic_integration.py   # ✅ 7 validation tests
-├── nodes.csv                           # 📊 Nodes (elevation, capacity, rainfall, sediment)
-├── edges.csv                           # 📊 Edges (flow_rate, pipe_diameter)
-├── vulnerability_analysis_results.csv  # 📈 Complete analysis output
-├── BAB2_BAB3_UPDATED.tex              # 📄 LaTeX paper (BAB 2 & 3)
-├── README.md                          # 📖 This file
-├── HASIL_ANALISIS.md                  # 📝 Detailed theory explanation
-├── SYSTEM_OVERVIEW.md                 # 🔍 System documentation
-└── UPGRADE_SUMMARY.md                 # 📋 Upgrade notes
-```
-
 ## 📦 Dataset
 
-Dataset lengkap tersedia di:
-**https://github.com/Akram17t/MakalahALGEO**
+Dataset lengkap tersedia di repository ini:
 
-Files:
-- `nodes.csv` - Data simpul dengan parameter hidraulik (200 nodes)
-- `edges.csv` - Data koneksi dengan flow rate dan diameter pipa (851 edges)
-- `vulnerability_analysis_results.csv` - Hasil analisis kerentanan
+**Input Files** (`data/`):
+- `nodes.csv` - 200 simpul dengan parameter hidraulik
+  - Coordinates (lat/long)
+  - Elevation, flow capacity, rainfall intensity
+  - Sediment risk, hydraulic load
+- `edges.csv` - 851 koneksi dengan flow rate dan pipe diameter
+
+**Output Files** (`hasil/`):
+- `vulnerability_analysis_results.csv` - Hasil analisis lengkap
+  - Vulnerability scores per node
+  - Eigenvalue & degree centrality
+  - Hydraulic vulnerability
+  - Classification (high/medium/low)
 
 ---
 
