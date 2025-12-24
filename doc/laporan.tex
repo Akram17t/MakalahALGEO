@@ -16,6 +16,7 @@
 \usepackage{multirow}
 \usepackage{hyperref}
 \usepackage{fancyhdr}
+\usepackage{placeins}
 
 \hypersetup{
     colorlinks=true,
@@ -90,11 +91,11 @@ matriks Laplacian, eigenvalue decomposition, power iteration method, spectral ce
     \caption{Ilustrasi Drainase}
 \end{figure}
 
-Sistem drainase perkotaan punya peran yang sangat penting dalam mencegah banjir dan mengelola air permukaan di area perkotaan. Sayangnya, pertumbuhan kota yang cepat telah banyak mengubah cara air mengalir—semakin banyak jalanan aspal dan bangunan beton, semakin sedikit tanah yang bisa menyerap air, dan aliran air pun berubah. Akibatnya, volume air hujan yang harus ditampung sistem drainase terus meningkat, sementara kapasitas saluran drainase yang ada tidak mengalami penambahan. Ditambah dengan curah hujan yang semakin sering dan lebat karena perubahan iklim, risiko banjir di kota-kota besar menjadi semakin mengkhawatirkan. Salah satu contoh nyata adalah banjir yang sering terjadi di Jakarta, di mana kegagalan sistem drainase akibat saluran tersumbat atau tidak terawat menyebabkan genangan air yang melumpuhkan aktivitas kota. Insiden seperti ini menunjukkan pentingnya analisis sistemik terhadap jaringan drainase—bukan hanya melihat kapasitas per saluran, tapi juga bagaimana semua sistem drainase saling terhubung dan pengaruhnya satu sama lain.
+Sistem drainase perkotaan punya peran yang sangat penting dalam mencegah banjir dan mengelola air permukaan di area perkotaan. Sayangnya, pertumbuhan kota yang cepat telah banyak mengubah cara air mengalir—semakin banyak jalanan aspal dan bangunan beton, semakin sedikit tanah yang dapat menyerap air, dan aliran air pun berubah. Akibatnya, volume air hujan yang harus ditampung sistem drainase terus meningkat, sementara kapasitas saluran drainase yang ada tidak mengalami penambahan. Ditambah dengan curah hujan yang semakin sering dan lebat karena perubahan iklim, risiko banjir di kota-kota besar menjadi semakin mengkhawatirkan. Salah satu contoh nyata adalah banjir yang sering terjadi di Jakarta, di mana kegagalan sistem drainase akibat saluran tersumbat atau tidak terawat menyebabkan genangan air yang melumpuhkan aktivitas kota. Insiden seperti ini menunjukkan pentingnya analisis sistemik terhadap jaringan drainase—bukan hanya melihat kapasitas per saluran, tapi juga bagaimana semua sistem drainase saling terhubung dan pengaruhnya satu sama lain.
 
-Cara konvensional yang biasa dipakai untuk mengecek kondisi drainase biasanya cuma fokus pada hal-hal yang sifatnya lokal: ukuran saluran, berapa banyak endapan lumpur yang numpuk, atau kondisi fisik setiap komponen. Memang cara ini berguna untuk perawatan rutin, namun ada kelemahannya—metode ini tidak dapat menangkap efek berantai yang terjadi apabila satu titik penting rusak atau macet. Misalnya, jika saluran utama di persimpangan penting tersumbat, air dapat meluap dan membanjiri area sekitarnya yang bergantung pada saluran tersebut, sementara saluran-saluran lain masih berfungsi normal. Inilah yang mendorong penulis mencoba pendekatan lain: menggunakan teori graf untuk melihat jaringan drainase secara keseluruhan. Lewat analisis spektral pada matriks Laplacian, kita bisa menemukan titik-titik mana yang paling kritis buat stabilitas seluruh sistem.
+Cara konvensional yang biasa dipakai untuk mengecek kondisi drainase biasanya cuma fokus pada hal-hal yang sifatnya lokal: ukuran saluran, berapa banyak endapan lumpur yang numpuk, atau kondisi fisik setiap komponen. Memang cara ini berguna untuk perawatan rutin, namun ada kelemahannya—metode ini tidak dapat menangkap efek berantai yang terjadi apabila satu titik penting rusak atau macet. Misalnya, jika saluran utama di persimpangan penting tersumbat, air dapat meluap dan membanjiri area sekitarnya yang bergantung pada saluran tersebut, sementara saluran-saluran lain masih berfungsi normal. Inilah yang mendorong penulis mencoba pendekatan lain: menggunakan teori graf untuk melihat jaringan drainase secara keseluruhan. Lewat analisis spektral pada matriks Laplacian, kita dapat menemukan titik-titik mana yang paling kritis buat stabilitas seluruh sistem.
 
-Matriks Laplacian adalah salah satu cara merepresentasikan struktur jaringan dalam bentuk matematis. Konsep ini mungkin terdengar abstrak, tapi sebenarnya cukup intuitif: dengan mengubah jaringan drainase menjadi matriks (tabel angka-angka), kita bisa menggunakan alat matematika yang powerful untuk menganalisisnya. Melalui eigenvalue decomposition (dekomposisi nilai eigen), kita bisa menganalisis seberapa kuat konektivitas jaringan dan seberapa mudah jaringan ini "pecah" kalau ada gangguan. Nilai eigen kedua terkecil ($\lambda_2$), yang sering disebut algebraic connectivity, memberikan informasi tentang seberapa robust jaringan terhadap fragmentasi --- semakin kecil nilainya, semakin rentan jaringan terhadap pemisahan. Selain itu, eigenvector dominan dari matriks adjacency—yang dapat dihitung secara efisien dengan power iteration method—menunjukkan titik mana yang paling berpengaruh dalam jaringan. Dalam makalah ini, penulis menggabungkan kedua metode aljabar linear tersebut dengan data fisik seperti elevasi, kapasitas aliran, risiko sedimentasi, dan beban hidraulik untuk membuat ranking titik-titik kritis yang dapat menjadi prioritas pemeliharaan.
+Matriks Laplacian adalah salah satu cara merepresentasikan struktur jaringan dalam bentuk matematis. Konsep ini mungkin terdengar abstrak, tapi sebenarnya cukup intuitif: dengan mengubah jaringan drainase menjadi matriks (tabel angka-angka), kita dapat menggunakan alat matematika yang powerful untuk menganalisisnya. Melalui eigenvalue decomposition (dekomposisi nilai eigen), kita dapat menganalisis seberapa kuat konektivitas jaringan dan seberapa mudah jaringan ini "pecah" jika ada gangguan. Nilai eigen kedua terkecil ($\lambda_2$), yang sering disebut algebraic connectivity, memberikan informasi tentang seberapa robust jaringan terhadap fragmentasi --- semakin kecil nilainya, semakin rentan jaringan terhadap pemisahan. Selain itu, eigenvector dominan dari matriks adjacency—yang dapat dihitung secara efisien dengan power iteration method—menunjukkan titik mana yang paling berpengaruh dalam jaringan. Dalam makalah ini, penulis menggabungkan kedua metode aljabar linear tersebut dengan data fisik seperti elevasi, kapasitas aliran, risiko sedimentasi, dan beban hidraulik untuk membuat ranking titik-titik kritis yang dapat menjadi prioritas pemeliharaan.
 
 
 
@@ -119,7 +120,7 @@ A x = \lambda x.
 \]
 Secara intuitif, vektor eigen adalah vektor yang arahnya tidak berubah ketika dikalikan dengan matriks $A$ --- hanya panjangnya yang berubah, dan perubahan panjang tersebut ditentukan oleh nilai eigen $\lambda$. Dalam konteks jaringan, vektor eigen dominan menunjukkan pola pengaruh atau "aliran kepentingan" yang paling kuat dalam sistem.
 
-Nilai eigen bisa dicari dengan menyelesaikan:
+Nilai eigen dapat dicari dengan menyelesaikan:
 \[
 \det(A - \lambda I) = 0.
 \]
@@ -142,7 +143,7 @@ di mana $c$ adalah vektor eigen dari $A$ yang sesuai dengan nilai eigen terbesar
 Jadi, eigenvalue centrality ini memberi tahu kita simpul mana yang paling "sentral" atau paling berpengaruh dalam jaringan.
 
 \subsection{Power Iteration}
-Power iteration adalah metode numerik sederhana tapi efektif untuk menghitung nilai eigen terbesar dan vektor eigennya. Metode ini bekerja dengan cara yang intuitif: kita mulai dengan vektor sembarang, kemudian berulang kali mengalikannya dengan matriks dan menormalisasi hasilnya. Setelah beberapa iterasi, vektor ini akan "konvergen" atau mendekati eigenvector dominan. Karena matriks adjacency pada jaringan drainase bisa sangat besar (ratusan atau ribuan simpul), metode ini jadi sangat berguna karena efisiensinya.
+Power iteration adalah metode numerik sederhana tapi efektif untuk menghitung nilai eigen terbesar dan vektor eigennya. Metode ini bekerja dengan cara yang intuitif: kita mulai dengan vektor sembarang, kemudian berulang kali mengalikannya dengan matriks dan menormalisasi hasilnya. Setelah beberapa iterasi, vektor ini akan "konvergen" atau mendekati eigenvector dominan. Karena matriks adjacency pada jaringan drainase dapat sangat besar (ratusan atau ribuan simpul), metode ini jadi sangat berguna karena efisiensinya.
 
 Algoritma dasarnya cukup simpel:
 \[
@@ -157,9 +158,9 @@ Spectral radius $\rho(A)$ didefinisikan sebagai nilai absolut terbesar dari semu
 \[
 \rho(A) = \max_i |\lambda_i|.
 \]
-Spectral radius memberikan informasi tentang seberapa "kuat" koneksi dalam jaringan dan seberapa cepat informasi atau pengaruh bisa menyebar. Nilai yang tinggi mengindikasikan adanya hub nodes (simpul pusat) yang sangat dominan dalam jaringan.
+Spectral radius memberikan informasi tentang seberapa "kuat" koneksi dalam jaringan dan seberapa cepat informasi atau pengaruh dapat menyebar. Nilai yang tinggi mengindikasikan adanya hub nodes (simpul pusat) yang sangat dominan dalam jaringan.
 
-Dalam konteks jaringan drainase, spectral radius bisa kasih info tentang:
+Dalam konteks jaringan drainase, spectral radius dapat kasih info tentang:
 \begin{itemize}
     \item seberapa stabil aliran air dalam jaringan,
     \item seberapa sensitif jaringan terhadap perubahan struktur,
@@ -203,11 +204,11 @@ Dalam praktiknya, Fiedler vector dari normalized Laplacian lebih sering digunaka
 
 \section{METODOLOGI PENELITIAN}
 
-Berdasarkan dasar teori yang telah dipaparkan, metodologi penelitian ini dirancang untuk melakukan analisis spektral pada jaringan drainase dummy dengan 200 titik sebagai prototype. Penggunaan data dummy dipilih karena data riil jaringan drainase perkotaan yang lengkap dan terstruktur (mencakup topologi jaringan, parameter hidraulik, dan metadata simpul) sangat sulit diakses secara publik karena alasan keterbatasan dokumentasi. Dataset dummy yang digunakan dirancang untuk merepresentasikan karakteristik realistis jaringan drainase perkotaan berdasarkan literatur dan standar teknis yang ada. Pendekatan berbasis matriks Laplacian digunakan untuk menemukan simpul-simpul yang paling rentan, sehingga metodologi yang dikembangkan dapat diterapkan pada data riil di masa mendatang. Metodologi ini dibagi menjadi lima tahap utama yang saling terkait.
+Berdasarkan dasar teori yang telah dipaparkan, metodologi penelitian ini dirancang untuk melakukan analisis spektral pada jaringan drainase dummy dengan 200 titik sebagai prototype. Penggunaan data dummy dipilih karena data riil jaringan drainase perkotaan yang lengkap dan terstruktur (mencakup topologi jaringan, parameter hidraulik, dan metadata simpul) sangat sulit diakses secara publik. Dataset dummy yang digunakan dirancang untuk merepresentasikan karakteristik realistis jaringan drainase perkotaan berdasarkan literatur dan standar teknis yang ada. Pendekatan berbasis matriks Laplacian digunakan untuk menemukan simpul-simpul yang paling rentan, sehingga metodologi yang dikembangkan dapat diterapkan pada data riil di masa mendatang. Metodologi ini dibagi menjadi lima tahap utama yang saling terkait.
 
 \subsection{Tahap I: Pemodelan Graf Jaringan Drainase}
 
-Tahap pertama ini fokus pada pembangunan model matematis jaringan drainase dalam bentuk graf berarah $G = (V, E)$, di mana setiap simpul mewakili titik saluran atau percabangan, dan setiap sisi mewakili arah aliran air.
+Tahap pertama ini fokus pada pembangunan model matematis jaringan drainase dalam bentuk graf $G = (V, E)$, di mana setiap simpul mewakili titik saluran atau percabangan, dan setiap sisi mewakili arah aliran air.
 
 \bigskip
 \subsubsection{Konstruksi Dataset dan Graf}
@@ -341,7 +342,7 @@ Lalu skor dinormalisasi ke rentang $[0, 0.95]$ untuk menghindari ceiling effect 
 \bigskip
 \subsection{Tahap IV: Evaluasi Kerentanan dan Identifikasi Simpul Kritis}
 
-Tahap terakhir bertujuan untuk menerjemahkan hasil analisis spektral dan hidraulik jadi metrik kerentanan yang bisa diinterpretasikan dan diterapkan dalam perencanaan pemeliharaan.
+Tahap terakhir bertujuan untuk menerjemahkan hasil analisis spektral dan hidraulik jadi metrik kerentanan yang dapat diinterpretasikan dan diterapkan dalam perencanaan pemeliharaan.
 
 \bigskip
 \subsubsection{Klasifikasi Kategori Kerentanan}
@@ -360,15 +361,6 @@ Simpul diklasifikasikan berdasarkan persentil skor:
 Simpul-simpul dengan skor $\text{Vul}(i)$ tertinggi diidentifikasi sebagai simpul kritis. Dalam implementasinya, fokus diberikan pada top 15 simpul untuk prioritas penanganan.
 
 \bigskip
-\subsubsection{Partisi Graf Spektral (Opsional)}
-Pembagian zona kerentanan bisa dilakukan dengan Fiedler Vector:
-\[
-    \text{Cluster 1} = \{i \mid v_{2,i} < 0\}, \quad
-    \text{Cluster 2} = \{i \mid v_{2,i} > 0\}.
-\]
-Teknik ini membantu mengidentifikasi wilayah paling rentan secara struktural.
-
-\bigskip
 \subsubsection{Validasi Multi-Kriteria}
 Hasil analisis divalidasi terhadap 7 kriteria teoritis:
 \begin{enumerate}
@@ -380,10 +372,6 @@ Hasil analisis divalidasi terhadap 7 kriteria teoritis:
     \item Keseimbangan multi-faktor
     \item Distribusi realistis (variance, IQR)
 \end{enumerate}
-
-\bigskip
-\subsubsection{Visualisasi Jaringan}
-Hasil analisis ditampilkan dalam graf jaringan, di mana warna dan ukuran simpul mewakili nilai kerentanan, plus tabel ranking simpul kritis beserta parameter hidrauliknya.
 
 \bigskip
 \subsection{Tahap V: Analisis Sensitivitas Bobot}
@@ -420,9 +408,9 @@ Analisis sensitivitas menghasilkan kurva Jaccard vs $w_3$ yang menunjukkan zona 
 \section{HASIL DAN PEMBAHASAN}
 
 \subsection{Dataset dan Akses Data}
-Dataset yang digunakan dalam penelitian ini adalah \textit{data dummy sintetis} yang dirancang untuk merepresentasikan karakteristik realistis jaringan drainase perkotaan berdasarkan literatur dan standar teknis. Dataset terdiri dari 200 simpul dengan struktur hierarkis: 20 simpul backbone, 150 simpul secondary, dan 30 simpul peripheral, dengan total 851 koneksi. Data mencakup koordinat geografis serta 6 parameter hidraulik utama: elevasi (5.0--23.6 m), kapasitas aliran (0.5--9.7 m³/s), intensitas hujan (30.8--109.0 mm/h), risiko sedimentasi (0.223--0.894), lebar saluran, dan beban hidraulik.
+Dataset yang digunakan dalam penelitian ini adalah \textit{data dummy sintetis} yang dirancang untuk merepresentasikan karakteristik realistis jaringan drainase perkotaan berdasarkan literatur dan standar teknis. Dataset terdiri dari 200 simpul dan 851 koneksi. Data mencakup koordinat geografis serta 6 parameter hidraulik utama: elevasi (5.0--23.6 m), kapasitas aliran (0.5--9.7 m³/s), intensitas hujan (30.8--109.0 mm/h), risiko sedimentasi (0.223--0.894), lebar saluran, dan beban hidraulik.
 
-Dataset lengkap bisa diakses di:
+Dataset lengkap dapat diakses di:
 \begin{verbatim}
 https://github.com/Akram17t/MakalahALGEO/
 \end{verbatim}
@@ -439,11 +427,11 @@ Pada folder data, ada dua file:
 \label{fig:jaringan}
 \end{figure}
 
-\noindent Gambar \ref{fig:jaringan} menampilkan struktur jaringan dummy dengan 200 simpul dan 851 edges yang digunakan dalam penelitian ini. Visualisasi ini menunjukkan konektivitas antar simpul dalam jaringan drainase yang dimodelkan. Setiap simpul merepresentasikan titik dalam sistem drainase (seperti pertemuan saluran atau titik pembuangan), sedangkan edges merepresentasikan saluran yang menghubungkan antar titik tersebut. Dari visualisasi ini, kita bisa melihat bahwa jaringan memiliki struktur yang cukup kompleks dengan beberapa simpul yang memiliki konektivitas tinggi (banyak terhubung ke simpul lain) dan beberapa simpul yang berada di pinggiran jaringan.
+\noindent Gambar \ref{fig:jaringan} menampilkan struktur jaringan dummy dengan 200 simpul dan 851 edges yang digunakan dalam penelitian ini. Visualisasi ini menunjukkan konektivitas antar simpul dalam jaringan drainase yang dimodelkan. Setiap simpul merepresentasikan titik dalam sistem drainase (seperti pertemuan saluran atau titik pembuangan), sedangkan edges merepresentasikan saluran yang menghubungkan antar titik tersebut. Dari visualisasi ini, kita dapat melihat bahwa jaringan memiliki struktur yang cukup kompleks dengan beberapa simpul yang memiliki konektivitas tinggi (banyak terhubung ke simpul lain) dan beberapa simpul yang berada di pinggiran jaringan.
 
 \subsection{Implementasi Algoritma}
 
-Implementasi dilakukan menggunakan Python 3.12 dengan library NumPy untuk komputasi matriks dan Pandas untuk manipulasi data. NumPy dipilih karena library ini menyediakan fungsi-fungsi khusus untuk komputasi aljabar linier yang sangat efisien, terutama \texttt{numpy.linalg.eigh()} untuk menghitung nilai eigen dan vektor eigen dari matriks simetris. Berikut snippet kode utama yang digunakan:
+Implementasi dilakukan menggunakan Python 3.12 dengan library NumPy untuk komputasi matriks dan Pandas untuk manipulasi data. NumPy dipilih karena library ini menyediakan fungsi-fungsi khusus untuk komputasi aljabar linier yang sangat efisien, terutama \texttt{numpy.linalg.eigh()} untuk menghitung nilai eigen dan vektor eigen dari matriks simetris. Berikut beberapa potongan kode utama yang digunakan (dikhawatirkan kode lengkap terlalu panjang untuk dimuat di sini) :
 
 \begin{lstlisting}[language=Python]
 import numpy as np
@@ -579,6 +567,7 @@ Tabel~\ref{tab:top10} menampilkan 10 simpul dengan tingkat kerentanan tertinggi.
 \centering
 \scriptsize\textit{E-C=Eigen-C, D-C=Deg-C, H-V=H-Vul, Elev=Elev(m), Cap=Cap(m³/s), Rain=Rain(mm/h)}
 \end{table}
+\FloatBarrier
 
 \subsection{Validasi Teoritis}
 
@@ -605,6 +594,7 @@ Distribution ($\sigma$, IQR) & 0.143, 0.160 & \checkmark \\
 \bottomrule
 \end{tabular}
 \end{table}
+\FloatBarrier
 
 Semua kriteria validasi menunjukkan hasil yang sesuai dengan ekspektasi teoritis. Korelasi positif antara \textit{degree} dan kerentanan ($r=0.400$) masuk akal karena simpul dengan banyak koneksi memiliki peran lebih penting dalam jaringan --- jika simpul ini bermasalah, dampaknya akan menyebar ke banyak bagian lain. Korelasi negatif antara elevasi dan kerentanan ($r=-0.316$) juga logis: simpul di elevasi lebih tinggi cenderung tidak tergenang saat banjir, sehingga lebih aman. Sebaliknya, korelasi positif untuk sedimen ($r=0.509$) dan beban hidraulik ($r=0.562$) menunjukkan bahwa simpul dengan akumulasi sedimen tinggi atau pemanfaatan kapasitas tinggi lebih rentan terhadap kegagalan sistem. Eigenvalue centrality yang berkorelasi positif dengan kerentanan ($r=0.715$) --- korelasi terkuat --- memvalidasi bahwa power iteration method memang menangkap informasi penting tentang struktur jaringan yang relevan dengan analisis risiko drainase.
 
@@ -614,7 +604,7 @@ Semua kriteria validasi menunjukkan hasil yang sesuai dengan ekspektasi teoritis
 Hasil analisis perlu diinterpretasikan dengan memahami bahwa representasi tak-berarah memberikan penilaian kerentanan yang bersifat \textit{konservatif}: simpul yang teridentifikasi kritis adalah simpul yang penting untuk konektivitas struktural jaringan. Dalam sistem drainase riil yang berarah, simpul-simpul ini tetap kritis, dengan tambahan kemungkinan ada simpul upstream tertentu yang kritikalitasnya lebih tinggi karena efek cascade downstream. Dengan demikian, hasil ini dapat digunakan sebagai \textit{lower bound} untuk identifikasi simpul kritis---prioritas pemeliharaan yang dihasilkan valid dan aman, meskipun analisis berarah lebih lanjut dapat mengungkap prioritas tambahan.
 
 \subsubsection{Kerentanan Jaringan}
-Nilai $\lambda_2 = 0.075$ jauh di bawah threshold 0.1, menandakan jaringan sangat rentan terhadap pemisahan. Kalau satu simpul kritis rusak, jaringan bisa terpecah jadi komponen terpisah.
+Nilai $\lambda_2 = 0.075$ jauh di bawah threshold 0.1, menandakan jaringan sangat rentan terhadap pemisahan. Jika satu simpul kritis rusak, jaringan dapat terpecah jadi komponen terpisah.
 
 \subsubsection{Dominasi Hub}
 Moderate spectral radius ($\rho(A)/\text{deg}_{\text{avg}} = 1.30$) menunjukkan distribusi beban relatif merata dengan beberapa hub strategis. Tidak terlalu ekstrem seperti star network.
@@ -633,15 +623,11 @@ Prioritas penanganan:
 
 
 \section{KESIMPULAN}
-Penelitian ini berhasil menerapkan pendekatan analisis spektral berbasis eigenvalue decomposition dan power iteration method untuk mengidentifikasi titik-titik kritis dalam jaringan drainase perkotaan. Melalui integrasi antara analisis topologi jaringan dan parameter hidraulik, penulis mengembangkan metode penilaian kerentanan yang lebih komprehensif dibandingkan pendekatan konvensional yang hanya mengevaluasi komponen secara terpisah.
+Penelitian ini berhasil menerapkan eigenvalue decomposition dan power iteration method untuk mengidentifikasi titik kritis jaringan drainase perkotaan. Integrasi analisis topologi spektral dengan parameter hidraulik menghasilkan metode penilaian kerentanan yang lebih komprehensif dibanding pendekatan konvensional.
 
-Hasil analisis menunjukkan bahwa nilai algebraic connectivity sebesar $\lambda_2 = 0.075$ mengindikasikan jaringan dummy yang dianalisis memiliki tingkat kerentanan yang cukup tinggi terhadap fragmentasi. Artinya, jika terdapat kegagalan pada simpul-simpul kritis, jaringan bisa terpecah menjadi beberapa komponen terpisah yang tidak terhubung, sehingga fungsi drainase menjadi tidak optimal. Korelasi yang kuat antara eigenvalue centrality dan skor kerentanan ($r=0.715$) membuktikan bahwa pendekatan spektral mampu menangkap informasi struktural penting yang tidak terlihat dari analisis konektivitas lokal saja. Selain itu, integrasi faktor hidraulik seperti risiko sedimentasi ($r=0.509$) dan beban hidraulik ($r=0.562$) memberikan kontribusi signifikan dalam menghasilkan penilaian kerentanan yang lebih realistis dan aplikatif.
+Hasil analisis menunjukkan algebraic connectivity $\lambda_2 = 0.075$ mengindikasikan kerentanan tinggi terhadap fragmentasi, di mana kegagalan simpul kritis dapat memecah jaringan menjadi komponen terpisah. Korelasi kuat antara eigenvalue centrality dan vulnerability ($r=0.715$) membuktikan metode spektral mampu menangkap informasi struktural penting. Distribusi kerentanan menunjukkan 30\% simpul masuk kategori tinggi yang memerlukan prioritas pemeliharaan. Model terbukti robust terhadap variasi bobot moderat dan menghasilkan ranking kuantitatif untuk perencanaan pemeliharaan preventif.
 
-Distribusi kerentanan yang dihasilkan menunjukkan pola 30-40-30, dengan sekitar 60 simpul (30\%) masuk dalam kategori kerentanan tinggi yang memerlukan prioritas pemeliharaan tertinggi. Analisis sensitivitas bobot membuktikan bahwa model cukup robust terhadap variasi parameter moderat, dengan kestabilan ranking tertinggi pada konfigurasi bobot baseline. Metode ini menghasilkan ranking kuantitatif yang dapat langsung digunakan untuk perencanaan pemeliharaan preventif dan alokasi sumber daya secara lebih efisien.
-
-Meskipun penelitian ini memberikan kontribusi metodologis yang signifikan, terdapat beberapa keterbatasan yang perlu diperhatikan dan dapat menjadi arah pengembangan selanjutnya. Pertama, penggunaan representasi graf tak-berarah mengorbankan informasi tentang dependensi asimetris dalam aliran drainase (upstream-downstream relationship). Meskipun simplifikasi ini valid untuk analisis first-order structural vulnerability dan konsisten dengan praktik umum dalam network science \cite{b6, b7}, analisis yang lebih komprehensif dapat menggunakan directed graph dengan metode seperti PageRank centrality atau directed Laplacian untuk menangkap efek cascade downstream. Kedua, model yang dikembangkan bersifat \textit{statis} --- menganalisis snapshot jaringan pada satu waktu tertentu tanpa mempertimbangkan dinamika temporal. Padahal, sistem drainase sangat dipengaruhi oleh faktor waktu: risiko sedimentasi bertambah secara bertahap seiring waktu, beban hidraulik berfluktuasi drastis dalam hitungan jam saat hujan ekstrem, dan kondisi struktural infrastruktur mengalami degradasi seiring usia. Pengembangan model \textit{dinamis} yang memasukkan variabel waktu atau skenario temporal (misalnya skenario curah hujan 5 tahunan vs 50 tahunan, atau analisis time-series degradasi infrastruktur) akan memberikan insight yang jauh lebih mendalam dan aplikatif untuk perencanaan jangka panjang.
-
-Kedua, penelitian ini masih menggunakan data dummy karena keterbatasan akses terhadap data infrastruktur publik yang lengkap. Validasi dengan data riil dari sistem drainase kota aktual (misalnya satu kecamatan di Jakarta atau Bandung) sangat diperlukan untuk memverifikasi akurasi prediksi dan mengungkap anomali yang mungkin tidak terdeteksi pada data simulasi. Ketiga, perbandingan dengan metrik sentralitas lain seperti \textit{betweenness centrality} atau \textit{closeness centrality} dapat memberikan perspektif tambahan tentang keunggulan metode spektral. Dengan demikian, pendekatan analisis spektral terintegrasi ini berhasil memberikan perspektif sistemik terhadap integritas jaringan drainase dan dapat menjadi fondasi untuk pengembangan sistem monitoring dan early warning berbasis waktu nyata di masa mendatang.
+Keterbatasan penelitian meliputi model statis yang tidak mempertimbangkan dinamika temporal seperti fluktuasi beban hidraulik atau degradasi infrastruktur. Pengembangan model dinamis dengan skenario temporal (mis. skenario curah hujan berkala) akan memberikan insight yang lebih aplikatif. Validasi dengan data riil sistem drainase aktual sangat diperlukan untuk memverifikasi akurasi prediksi. Pendekatan ini dapat menjadi fondasi pengembangan sistem monitoring dan early warning berbasis waktu nyata.
 
 
 

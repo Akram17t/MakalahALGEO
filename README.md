@@ -1,12 +1,32 @@
-# Advanced Drainage Network Analysis
-## Spectral Analysis + Hydraulic Integration 💧
+Makalah & kode: analisis kerentanan jaringan drainase.
 
-Analisis jaringan drainase komprehensif yang mengintegrasikan:
-- **Spectral Analysis**: Eigenvalue/eigenvector decomposition
-- **Power Iteration**: Eigenvalue centrality computation
-- **Spectral Radius**: Network stability analysis
-- **Hydraulic Modeling**: Elevation, flow capacity, rainfall, sediment
-- **Multi-Factor Vulnerability**: Vul(i) = f(c_i, deg(i), H_vul(i))
+Cara cepat:
+- Pastikan Python terpasang.
+- Jalankan: `python src/drainase.py`
+
+Data contoh: `data/nodes.csv`, `data/edges.csv`
+Output: `doc/laporan_natural.pdf` dan gambar di `doc/`
+
+Penulis: Nashiruddin Akram (IF2123, ITB)
+# Analisis Kerentanan Jaringan Drainase Perkotaan
+## Eigenvalue Decomposition & Power Iteration Method
+
+> Makalah IF2123 Aljabar Linear dan Geometri  
+> Semester I Tahun 2024/2025  
+> Program Studi Teknik Informatika  
+> Institut Teknologi Bandung
+
+---
+
+## 📋 Deskripsi
+
+Penelitian ini mengembangkan pendekatan analisis spektral untuk mengidentifikasi titik-titik kritis dalam jaringan drainase perkotaan. Dengan mengintegrasikan eigenvalue decomposition dan power iteration method, dikombinasikan dengan parameter hidraulik (elevasi, kapasitas aliran, sedimentasi), sistem ini menghasilkan ranking simpul berdasarkan tingkat kerentanan terhadap kegagalan sistem.
+
+**Metodologi:**
+- **Spectral Graph Theory**: Analisis eigenvalue/eigenvector dari matriks Laplacian
+- **Power Iteration**: Komputasi eigenvalue centrality untuk identifikasi simpul berpengaruh
+- **Hydraulic Integration**: Kombinasi faktor topologi dan parameter fisik drainase
+- **Multi-Factor Scoring**: Integrasi skor spektral (60%) dan hidraulik (40%)
 
 ---
 
@@ -14,90 +34,156 @@ Analisis jaringan drainase komprehensif yang mengintegrasikan:
 
 ```
 MakalahALGEO/
-├── data/                 # Dataset input
-│   ├── nodes.csv        # 200 nodes dengan parameter hidraulik
-│   └── edges.csv        # 851 koneksi jaringan
-├── src/                  # Source code
-│   └── drainase.py      # Main analysis script
-├── doc/                  # Dokumentasi
-│   └── laporan.tex      # Laporan penelitian (LaTeX)
-├── hasil/                # Output hasil analisis
-│   └── vulnerability_analysis_results.csv
-└── README.md            # Dokumentasi ini
+├── data/                    # Dataset jaringan drainase
+│   ├── nodes.csv           # 200 simpul dengan parameter hidraulik
+│   └── edges.csv           # 851 koneksi jaringan
+├── src/                     # Source code
+│   └── drainase.py         # Script analisis utama
+├── doc/                     # Dokumentasi dan laporan
+│   ├── laporan_natural.tex # Laporan LaTeX
+│   ├── laporan_natural.pdf # Laporan PDF
+│   ├── Jaringan.png        # Visualisasi jaringan
+│   ├── Kerentanan.png      # Visualisasi kerentanan
+│   ├── sensitivity_plot.png # Analisis sensitivitas
+│   ├── Drainase.png        # Ilustrasi drainase
+│   └── TTD.png             # Tanda tangan
+├── hasil/                   # Output hasil analisis
+│   └── results.csv         # Hasil lengkap analisis
+└── README.md               # Dokumentasi ini
 ```
 
 ---
 
-## 🎯 Hasil Analisis
+## 🎯 Hasil Utama
 
-### Network Properties
-- **200 nodes** (20 backbone + 150 secondary + 30 peripheral)
-- **851 edges** (hierarchical structure)
-- **Algebraic connectivity (λ₂)**: 0.0749 → Network sangat fragile
-- **Spectral radius ρ(A)**: 10.23 → Moderate hub dominance
+### Properti Jaringan
+- **200 simpul** (20 backbone + 150 secondary + 30 peripheral)
+- **851 koneksi** (struktur hierarkis)
+- **Algebraic connectivity (λ₂)**: 0.0749 → Jaringan sangat rentan terhadap fragmentasi
+- **Spectral radius ρ(A)**: 10.23 → Dominasi hub moderat
 - **Average degree**: 7.89
 
-### Hydraulic Parameters
-- **Elevation**: 5.0 - 23.6 m (topography/flood risk)
-- **Flow capacity**: 0.5 - 9.7 m³/s
-- **Rainfall intensity**: 30.8 - 109.0 mm/h
-- **Sediment risk**: 0.223 - 0.894 (blockage probability)
-- **Hydraulic load**: 0.349 - 1.000 (capacity utilization)
-
 ### Distribusi Kerentanan
-- **High vulnerability**: 60 nodes (30.0%) → Priority maintenance
-- **Medium vulnerability**: 80 nodes (40.0%)
-- **Low vulnerability**: 60 nodes (30.0%)
+- **Kerentanan Tinggi**: 60 simpul (30.0%) → Prioritas pemeliharaan
+- **Kerentanan Sedang**: 80 simpul (40.0%)
+- **Kerentanan Rendah**: 60 simpul (30.0%)
+
+### Temuan Kunci
+- Nilai λ₂ = 0.0749 (<0.1) mengindikasikan jaringan sangat rentan terhadap pemisahan
+- Korelasi eigenvalue centrality terhadap vulnerability: **r = 0.715** (sangat kuat)
+- Integrasi faktor hidraulik meningkatkan akurasi identifikasi simpul kritis
+- Model robust terhadap variasi bobot (Jaccard index ≈ 1.0 di sekitar baseline)
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Cara Penggunaan
 
-### 1. Run Complete Analysis
+### 1. Menjalankan Analisis
 ```bash
 cd src
 python drainase.py
 ```
 
 **Input:**
-- `data/nodes.csv` - Node data dengan parameter hidraulik
-- `data/edges.csv` - Edge data dengan flow rates
+- `data/nodes.csv` - Data simpul dengan koordinat dan parameter hidraulik
+- `data/edges.csv` - Data koneksi dengan flow rate
 
 **Output:**
-- `hasil/results.csv` - Complete analysis results dengan semua metrics
-- Console: Network statistics, top 15 vulnerable nodes
+- `hasil/results.csv` - Hasil analisis lengkap dengan semua metrik
+- Console: Statistik jaringan dan 15 simpul paling rentan
 
-### 2. Compile Dokumentasi LaTeX
+### 2. Kompilasi Laporan LaTeX
 ```bash
 cd doc
-pdflatex laporan.tex
+pdflatex -interaction=nonstopmode laporan_natural.tex
+pdflatex -interaction=nonstopmode laporan_natural.tex
 ```
 
 ---
 
-## 📦 Dataset
+## 📊 Metodologi
 
-Dataset lengkap tersedia di repository ini:
+### 1. Analisis Spektral Matriks Laplacian
 
-**Input Files** (`data/`):
-- `nodes.csv` - 200 simpul dengan parameter hidraulik
-  - Coordinates (lat/long)
-  - Elevation, flow capacity, rainfall intensity
-  - Sediment risk, hydraulic load
-- `edges.csv` - 851 koneksi dengan flow rate dan pipe diameter
+**Matriks Laplacian:**
+```
+L = D - A
+```
+- **A**: Matriks adjacency (simetris, graf tak-berarah)
+- **D**: Matriks degree (diagonal)
+- **L**: Matriks Laplacian (simetris semi-definit positif)
 
-**Output Files** (`hasil/`):
-- `vulnerability_analysis_results.csv` - Hasil analisis lengkap
-  - Vulnerability scores per node
-  - Eigenvalue & degree centrality
-  - Hydraulic vulnerability
-  - Classification (high/medium/low)
+**Eigenvalue Decomposition:**
+```
+L·v = λ·v
+```
+- **λ₁ = 0**: Nilai eigen trivial
+- **λ₂**: Algebraic connectivity (ukuran robustness)
+- **v₂**: Fiedler vector (partisi jaringan)
+
+**Interpretasi:**
+- **λ₂ < 0.1** → Jaringan sangat rentan
+- **λ₂ ∈ [0.1, 0.5]** → Jaringan cukup rentan
+- **λ₂ > 0.5** → Jaringan relatif robust
+
+### 2. Power Iteration Method
+
+**Eigenvalue Centrality:**
+```
+x_{k+1} = A·x_k / ||A·x_k||
+```
+
+Metode iteratif untuk menghitung eigenvector dominan dari matriks adjacency, mengidentifikasi simpul-simpul yang secara spektral paling berpengaruh dalam jaringan.
+
+**Konvergensi:**
+- Toleransi: ε = 10⁻⁶
+- Maksimum iterasi: 100
+- Hasil: Eigenvalue centrality setiap simpul
+
+### 3. Analisis Hidraulik
+
+**Komponen Kerentanan Hidraulik:**
+```
+H_vul(i) = 0.25·r_elev(i) + 0.30·r_cap(i) + 0.25·r_sed(i) + 0.20·r_load(i)
+```
+
+**Faktor:**
+1. **Risiko Elevasi** (r_elev): Elevasi rendah = risiko banjir tinggi
+2. **Risiko Kapasitas** (r_cap): Rasio intensitas hujan terhadap kapasitas
+3. **Risiko Sedimentasi** (r_sed): Probabilitas penyumbatan saluran
+4. **Beban Hidraulik** (r_load): Utilisasi kapasitas saluran
+
+### 4. Skor Kerentanan Terintegrasi
+
+**Formula Final:**
+```
+Vul(i) = 0.30·c_i + 0.30·deg(i)/(n-1) + 0.40·H_vul(i)
+```
+
+**Pembobotan:**
+- **30% Eigenvalue Centrality**: Kepentingan spektral
+- **30% Degree Centrality**: Kepentingan topologis
+- **40% Hydraulic Vulnerability**: Faktor fisik dominan
 
 ---
 
-## 📊 Methodology
+## ✅ Validasi Teoritis (7/7 Kriteria)
 
-### 1. Spectral Analysis (BAB 2)
+| Test | Ekspektasi | Hasil | Status |
+|------|------------|-------|--------|
+| Degree → Vulnerability | Positif | r = 0.400 | ✓ |
+| Elevation → Vulnerability | Negatif | r = -0.316 | ✓ |
+| Sediment → Vulnerability | Positif | r = 0.509 | ✓ |
+| Hydraulic Load → Vulnerability | Positif | r = 0.562 | ✓ |
+| Eigenvalue Centrality → Vulnerability | Positif | r = 0.715 | ✓ |
+| Multi-Factor Balance | Seimbang | 5/10 topologi, 8/10 hidraulik | ✓ |
+| Distribusi Realistis | Variance memadai | σ = 0.143, IQR = 0.160 | ✓ |
+
+**Skor Keseluruhan: 100%**
+
+---
+
+## 🔬 15 Simpul Paling Rentan
 
 **Laplacian Matrix:**
 ```
@@ -199,204 +285,148 @@ Vul(i) = 0.30·eigenvalue_centrality
 
 ---
 
-## 🔬 Top 15 Most Vulnerable Nodes
 
-| Node | Degree | Vulnerability | Type | Elevation | Capacity | Rainfall | Sediment |
-|------|--------|---------------|------|-----------|----------|----------|----------|
-| **94** | **16** | **0.950** | secondary | 13.4m | 3.5m³/s | 52.2mm/h | 0.423 |
-| **105** | **12** | **0.945** | secondary | 12.9m | 2.8m³/s | 66.2mm/h | 0.653 |
-| **85** | **14** | **0.935** | secondary | 12.2m | 3.1m³/s | 55.0mm/h | 0.486 |
-| **109** | **14** | **0.924** | secondary | 13.2m | 3.9m³/s | 51.9mm/h | 0.414 |
-| **115** | **11** | **0.903** | secondary | 9.2m | 3.0m³/s | 44.3mm/h | 0.697 |
-| 122 | 14 | 0.897 | secondary | 15.0m | 4.6m³/s | 77.4mm/h | 0.679 |
-| 114 | 11 | 0.885 | secondary | 10.5m | 3.1m³/s | 67.5mm/h | 0.636 |
-| 108 | 12 | 0.874 | secondary | 15.2m | 4.3m³/s | 86.9mm/h | 0.685 |
-| 111 | 15 | 0.865 | secondary | 14.2m | 4.2m³/s | 57.2mm/h | 0.554 |
-| 140 | 12 | 0.865 | secondary | 13.2m | 4.6m³/s | 62.4mm/h | 0.557 |
-| 81 | 11 | 0.862 | secondary | 11.2m | 2.6m³/s | 66.1mm/h | 0.519 |
-| 101 | 12 | 0.859 | secondary | 14.1m | 4.4m³/s | 51.1mm/h | 0.566 |
-| 119 | 13 | 0.859 | secondary | 13.2m | 4.3m³/s | 69.9mm/h | 0.554 |
-| 82 | 10 | 0.858 | secondary | 15.3m | 4.9m³/s | 80.3mm/h | 0.673 |
-| 126 | 13 | 0.858 | secondary | 10.7m | 3.3m³/s | 74.8mm/h | 0.426 |
+| Node | Degree | Vul | Eigen-C | Deg-C | H-Vul | Elev (m) | Cap (m³/s) | Rain (mm/h) |
+|------|--------|-----|---------|-------|-------|----------|------------|-------------|
+| **94** | **16** | **0.950** | 1.000 | 0.080 | 0.592 | 13.5 | 3.5 | 52.2 |
+| **105** | **12** | **0.945** | 0.833 | 0.060 | 0.721 | 12.9 | 2.8 | 66.2 |
+| **85** | **14** | **0.935** | 0.883 | 0.070 | 0.656 | 12.2 | 3.1 | 55.0 |
+| 109 | 14 | 0.924 | 0.933 | 0.070 | 0.595 | 13.2 | 3.9 | 51.9 |
+| 115 | 11 | 0.903 | 0.559 | 0.055 | 0.843 | 9.2 | 3.0 | 44.3 |
+| 122 | 14 | 0.897 | 0.746 | 0.070 | 0.678 | 15.0 | 4.6 | 77.4 |
+| 114 | 11 | 0.885 | 0.600 | 0.055 | 0.776 | 10.5 | 3.1 | 67.5 |
+| 108 | 12 | 0.874 | 0.699 | 0.060 | 0.675 | 15.2 | 4.3 | 86.9 |
+| 111 | 15 | 0.865 | 0.712 | 0.075 | 0.636 | 14.2 | 4.2 | 57.2 |
+| 140 | 12 | 0.865 | 0.687 | 0.060 | 0.665 | 13.2 | 4.6 | 62.4 |
+| 81 | 11 | 0.862 | 0.652 | 0.055 | 0.707 | 11.2 | 2.6 | 66.1 |
+| 101 | 12 | 0.859 | 0.677 | 0.060 | 0.660 | 14.1 | 4.4 | 51.1 |
+| 119 | 13 | 0.859 | 0.688 | 0.065 | 0.661 | 13.2 | 4.3 | 69.9 |
+| 82 | 10 | 0.858 | 0.568 | 0.050 | 0.757 | 15.3 | 4.9 | 80.3 |
+| 126 | 13 | 0.858 | 0.691 | 0.065 | 0.654 | 10.7 | 3.3 | 74.8 |
 
-**Characteristics:**
-- Average degree: **13.1** (vs 7.89 overall) → **1.66x ratio**
-- All nodes are **secondary channels** (not backbone or peripheral)
-- Mix of high hydraulic risk factors (sediment, rainfall, low elevation)
-- Strategic positions in network topology
-
----
-
-## 💡 Key Findings
-
-### 1. Network Fragility 🔴
-- **λ₂ = 0.075** (< 0.1) → Network sangat rentan terputus
-- Low algebraic connectivity = weak global connectivity
-- Critical nodes sangat penting untuk network integrity
-
-### 2. Hub Dominance (Moderate) 🟡
-- **ρ(A) = 10.23** → Beberapa hub nodes signifikan
-- Not extreme star topology (good)
-- Load distribution relatif merata dengan hub strategis
-
-### 3. Hydraulic Integration Works ✅
-- **Strong correlations**: Semua hydraulic factors berkontribusi
-- Sediment risk: **r = 0.509** (strongest hydraulic factor)
-- Hydraulic load: **r = 0.562** (capacity vs rainfall)
-- Elevation: **r = -0.316** (flood risk)
-
-### 4. Multi-Factor Vulnerability 🎯
-- Balanced approach: Top nodes show multi-factor vulnerability
-- Not purely topological (degree) atau hydraulic
-- **Integration works**: 30% spectral + 30% degree + 40% hydraulic
-
-### 5. Realistic Distribution 📊
-- **30-40-30 split** (high-medium-low)
-- Standard deviation: **0.143** (good variance)
-- No artificial ceiling (max 0.95, not 1.0)
-- Natural spread without extreme outliers
+**Karakteristik:**
+- Rata-rata degree: **13.1** (vs 7.89 keseluruhan) → Rasio 1.66x
+- Semua simpul adalah **secondary channels** (bukan backbone atau peripheral)
+- Kombinasi faktor risiko hidraulik tinggi (sedimen, curah hujan, elevasi rendah)
+- Posisi strategis dalam topologi jaringan
 
 ---
 
-## 🎓 Theory Implementation (BAB 2)
+## 💡 Temuan Penting
 
-Implementation mencakup **SEMUA** konsep dari BAB 2:
+### 1. Kerentanan Jaringan
+- **λ₂ = 0.075** (< 0.1) mengindikasikan jaringan sangat rentan terputus
+- Konektivitas aljabar rendah = konektivitas global lemah
+- Simpul kritis sangat penting untuk integritas jaringan
 
-| Concept | BAB 2 Theory | Implementation | Status |
-|---------|-------------|----------------|--------|
-| Graf Berarah | Directed graph theory | Undirected (symmetric A) | ✅ |
-| Eigenvalue | λ of Laplacian | `np.linalg.eigh(L)` | ✅ |
-| Eigenvector | v of Laplacian | Full decomposition | ✅ |
-| Eigenvalue Centrality | Dominant eigenvector | Power iteration method | ✅ |
-| Power Iteration | x_{k+1} = A·x_k/‖·‖ | 100 iterations, tol=1e-6 | ✅ |
-| Spectral Radius | ρ(A) = max\|λᵢ(A)\| | `max(abs(eigvalsh(A)))` | ✅ |
-| Algebraic Connectivity | λ₂ (second eigenvalue) | `eigenvalues[1]` | ✅ |
-| Graph Connectivity | L = D - A | Laplacian analysis | ✅ |
-| Kerentanan Formula | Vul(i) = f(c_i, deg(i), flow(i)) | Multi-factor integration | ✅ |
+### 2. Integrasi Hidraulik
+- **Korelasi kuat**: Semua faktor hidraulik berkontribusi signifikan
+- Risiko sedimentasi: **r = 0.509** (faktor hidraulik terkuat)
+- Beban hidraulik: **r = 0.562** (kapasitas vs curah hujan)
+- Elevasi: **r = -0.316** (risiko banjir)
 
-**Coverage: 9/9 (100%)** 🏆
+### 3. Pendekatan Multi-Faktor
+- Pendekatan seimbang: Simpul teratas menunjukkan kerentanan multi-faktor
+- Bukan murni topologis (degree) atau hidraulik
+- **Integrasi efektif**: 30% spektral + 30% degree + 40% hidraulik
 
----
-
-## 📈 Interpretasi Hasil
-
-### Why High-Degree Nodes Are Vulnerable?
-
-**Dead End ≠ Bottleneck:**
-- **Dead end** (low degree): Only affects itself → local impact
-- **Bottleneck** (high degree): Affects many nodes → global impact
-- **Formula weights**: 30% degree + 30% eigenvalue + 40% hydraulic
-
-**Example (Node 94 - Most Vulnerable):**
-- **Degree**: 16 (highest) → Hub node
-- **Eigenvalue centrality**: 1.0 (highest) → Spectrally critical
-- **Hydraulic**: 0.59 (moderate) → Physical constraints
-- **Result**: 0.950 (critical bottleneck)
-
-### Why Low Elevation Increases Vulnerability?
-
-**Topography Effect:**
-- Low elevation → Higher flood risk
-- Water accumulation during heavy rain
-- Drainage capacity must handle upstream flow
-- **Correlation**: r = -0.316 (negative = low elev = high vuln)
-
-### Why Sediment Risk Matters?
-
-**Blockage Probability:**
-- High sediment → Channel blockage
-- Reduces effective capacity
-- Maintenance-dependent factor
-- **Correlation**: r = 0.509 (strongest hydraulic factor)
+### 4. Distribusi Realistis
+- **Pola 30-40-30** (tinggi-sedang-rendah)
+- Standar deviasi: **0.143** (variance baik)
+- Tidak ada ceiling artifisial (max 0.95, bukan 1.0)
+- Sebaran alami tanpa outlier ekstrem
 
 ---
 
-## 🛠️ Actionable Insights
+## 🛠️ Rekomendasi Praktis
 
-### Priority Maintenance (Top 60 Nodes)
-- **30% high vulnerability** → Focus maintenance here
-- Average vulnerability: **0.80+**
-- Critical for network integrity
+### Pemeliharaan Prioritas (60 Simpul Teratas)
+- **30% kerentanan tinggi** → Fokus pemeliharaan di sini
+- Vulnerability rata-rata: **≥0.739**
+- Kritis untuk integritas jaringan
 
-### Capacity Upgrade Targets
-- Nodes with **hydraulic_load > 0.8** (overloaded)
-- Rainfall exceeds design capacity
-- Consider pipe diameter increase
+### Target Peningkatan Kapasitas
+- Simpul dengan **beban hidraulik > 0.8** (overload)
+- Curah hujan melebihi kapasitas desain
+- Pertimbangkan peningkatan diameter pipa
 
-### Sediment Control
-- Nodes with **sediment_risk > 0.7**
-- Increased cleaning frequency
-- Install sediment traps
+### Kontrol Sedimentasi
+- Simpul dengan **risiko sedimen > 0.7**
+- Frekuensi pembersihan ditingkatkan
+- Instalasi sediment trap
 
-### Flood Protection
-- Low elevation nodes (**<10m**) with high vulnerability
-- Pump station installation
-- Raised channel elevation
+### Proteksi Banjir
+- Simpul elevasi rendah (**<10m**) dengan kerentanan tinggi
+- Instalasi pompa
+- Elevasi saluran dinaikkan
 
 ---
 
-## 🔧 Technical Details
+## 🔧 Detail Teknis
 
 ### Dependencies
 ```bash
-pip install numpy pandas scipy
+pip install numpy pandas scipy matplotlib networkx
 ```
 
-### Python Version
+### Versi Python
 ```
 Python 3.12.6
 ```
 
-### Libraries Used
+### Library yang Digunakan
 - **NumPy**: Eigenvalue decomposition (`np.linalg.eigh`)
-- **Pandas**: CSV data handling
-- **SciPy**: Statistical analysis (`pearsonr`, `spearmanr`)
+- **Pandas**: Manipulasi data CSV
+- **SciPy**: Analisis statistik
+- **Matplotlib**: Visualisasi
+- **NetworkX**: Visualisasi jaringan
 
-### Computational Complexity
-- **Eigenvalue decomposition**: O(n³) for n×n matrix
+### Kompleksitas Komputasi
+- **Eigenvalue decomposition**: O(n³) untuk matriks n×n
 - **Power iteration**: O(n² × iterations)
-- **Total runtime**: ~2-3 seconds for 200 nodes
+- **Runtime total**: ~2-3 detik untuk 200 simpul
 
 ---
 
-## 📚 References
+## 📚 Referensi
 
-**Theory Foundation (BAB 1-3):**
-- Spectral Graph Theory (Chung, 1997)
-- Hydraulic Network Analysis (Mays, 2000)
-- Eigenvalue Centrality (Bonacich, 1987)
-- Power Iteration Method (Golub & Van Loan, 1996)
-
-**Implementation:**
-- BAB 1: Hydraulic factors (elevation, capacity, rainfall, sediment)
-- BAB 2: Spectral analysis (eigenvalue, eigenvector, power iteration, spectral radius)
-- BAB 3: Methodology (Laplacian, algebraic connectivity, integration)
+1. F.R.K. Chung, "Spectral Graph Theory," American Mathematical Society, 1997
+2. M. Fiedler, "Algebraic connectivity of graphs," Czechoslovak Mathematical Journal, 1973
+3. U. Von Luxburg, "A tutorial on spectral clustering," Statistics and Computing, 2007
+4. P. Bonacich, "Power and centrality: A family of measures," American Journal of Sociology, 1987
+5. G. H. Golub and C. F. Van Loan, "Matrix Computations," Johns Hopkins University Press, 1996
+6. M.E.J. Newman, "Networks: An Introduction," Oxford University Press, 2010
+7. A.-L. Barabási, "Network Science," Cambridge University Press, 2016
 
 ---
 
-## 👨‍💻 Development
+## 👨‍💻 Informasi Pengembang
 
-**Developed for:**  
-Tugas Besar Aljabar Linear dan Geometri
+**Nama:** Nashiruddin Akram  
+**NIM:** 13524090  
+**Program Studi:** Teknik Informatika  
+**Institut:** Institut Teknologi Bandung  
+**Mata Kuliah:** IF2123 Aljabar Linear dan Geometri  
+**Semester:** I Tahun 2024/2025
 
-**Analysis Type:**  
-Spectral Graph Theory + Hydraulic Engineering
-
-**Language:**  
-Python 3.12.6
-
-**Focus:**  
-Real-world drainage network vulnerability assessment dengan integrasi teori spektral dan parameter hidraulik
+**Email:** akrambaasir@gmail.com | 13524090@std.stei.itb.ac.id  
+**Repository:** https://github.com/Akram17t/MakalahALGEO/
 
 ---
 
-## 🎉 Summary
+## 📝 Lisensi
 
-✅ **Comprehensive Analysis**: Spectral + Hydraulic integration  
-✅ **Theory Compliance**: 9/9 concepts from BAB 2 implemented  
-✅ **Validation**: 7/7 tests passed (100%)  
-✅ **Realistic Data**: Hierarchical network with hydraulic parameters  
-✅ **Actionable Insights**: Priority maintenance, capacity upgrade targets  
-✅ **Documentation**: Complete README + detailed HASIL_ANALISIS.md  
+© 2025 Nashiruddin Akram. Makalah ini dibuat untuk keperluan akademis Tugas Besar IF2123 Aljabar Linear dan Geometri, Institut Teknologi Bandung.
 
-**Status:** Production-ready, theory-validated, comprehensive drainage network analysis system 🚀
+---
+
+## 🎉 Ringkasan
+
+✅ **Analisis Komprehensif**: Integrasi spektral + hidraulik  
+✅ **Validasi Teoritis**: 7/7 kriteria terpenuhi (100%)  
+✅ **Metodologi Robust**: Analisis sensitivitas menunjukkan stabilitas model  
+✅ **Data Realistis**: Jaringan hierarkis dengan parameter hidraulik  
+✅ **Rekomendasi Praktis**: Prioritas pemeliharaan dan target peningkatan kapasitas  
+✅ **Dokumentasi Lengkap**: README + laporan LaTeX lengkap dengan visualisasi  
+
+**Status:** Siap untuk submission, tervalidasi secara teoritis, sistem analisis jaringan drainase komprehensif 🚀
