@@ -1,13 +1,3 @@
-Makalah & kode: analisis kerentanan jaringan drainase.
-
-Cara cepat:
-- Pastikan Python terpasang.
-- Jalankan: `python src/drainase.py`
-
-Data contoh: `data/nodes.csv`, `data/edges.csv`
-Output: `doc/laporan_natural.pdf` dan gambar di `doc/`
-
-Penulis: Nashiruddin Akram (IF2123, ITB)
 # Analisis Kerentanan Jaringan Drainase Perkotaan
 ## Eigenvalue Decomposition & Power Iteration Method
 
